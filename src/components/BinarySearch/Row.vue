@@ -7,7 +7,7 @@
 <script setup lang="ts">
     import { onMounted, ref } from "vue"
     import type { Ref } from "vue"
-    const selected: Ref<number> = ref(0);
+    const selected: Ref<number> = ref(Number.POSITIVE_INFINITY);
     const props = defineProps<{
         elements: Array<number>;
         find: number
@@ -15,7 +15,19 @@
     function startSearch() {
         let right = props.elements.length - 1;
         let left = 0;
+        let mid = (right + left)/2
+        while(left != right) {
+            if(mid > props.find) {
+                right = mid
+                mid = (right  + left)/2
+            } else if (mid < props.find) {
+                left = mid
+                mid = (right  + left)/2
 
+            } else if (mid === props.find) {
+
+            }
+        }
 
     }
     function selectedClass(el: number): boolean {
