@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+  <h1>Hello</h1>
+  <router-link to="/binarySearch">binarySearch</router-link>
   </main>
 </template>
