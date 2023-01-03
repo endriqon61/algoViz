@@ -4,9 +4,15 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-
+<div class="container">
   <RouterView />
+</div>
 </template>
 
-<style scoped>
+<style >
+  #app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 </style>
