@@ -4,8 +4,8 @@ import type { INode } from '../../interfaces/Graph'
 
 async function buildRoad(ra: string[], nl: Ref<INode[]>, cols: number) {
     await sleep(1000)
-    for(let roadNode = 0; roadNode < ra.length; roadNode++) {
-        await sleep(50)
+    for(let roadNode = 1; roadNode < ra.length; roadNode++) {
+        await sleep(75)
         const cords = ra[roadNode].split(',')
         const index = cols*(parseInt(cords[0]) - 1) + parseInt(cords[1]) - 1  
         nl.value[index].isRoadNode = true

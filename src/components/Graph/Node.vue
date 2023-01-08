@@ -1,16 +1,31 @@
 <template lang="">
-    <div @mouseover="makeWallNode()" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
+    <div :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
         <div :class="{animation: props.isVisited, road: props.isRoadNode } "></div> 
     </div>
 </template>
 <script setup lang="ts">
    import { ref,  onMounted } from "vue"
-   const emit = defineEmits(['wall'])
+   const emit = defineEmits(['dragCustom', 'wall', 'dragendCustom'])
+   const dragging = ref(true) 
+   const nodeElement: any = ref(null)
+   const newStartNode: any = ref()
+   const nodeElementWithId: any = document.getElementById("nodeId")
    const props = defineProps<{isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, row: number, col: number}>() 
+
+   function dragEndHandler(e: Event) {
+        dragging.value = false
+        emit('dragendCustom')
+   }
+   function dragHandler(e: Event){
+        emit("dragCustom", e.currentTarget)
+   }
+
     function makeWallNode() {
+        // dragging.value = false
         emit('wall', props.row, props.col)
     }
     onMounted(() => {
+    if (props.isStartNode || props.isEndNode) nodeElement.value.draggable = true
     if(props.isRoadNode) {
     console.log("props ", props) 
 

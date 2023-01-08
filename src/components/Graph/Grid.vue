@@ -1,45 +1,77 @@
 <template lang="">
-    <div @mousedown="toggleWallNode = true" @mouseup="toggleWallNode = false" class="grid-container">
-       <Node v-for="node in nodeList" @wall="(r, c) => { makeWallNode(r, c) }" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+    <div ref="grid" @mousedown="toggleWallNode = true" @mouseup="toggleWallNode = false" class="grid-container">
+       <Node @dragCustom="(n) => dragHandler(n)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
     </div>
     <button @click="visualizeAlgorithm()">Visualize!</button>
     <button @click="clearGraph(true)">Clear Graph</button>
+    <button @click="() => { wallMode = !wallMode; toggleWallNode = false }">Draw a wall</button>
+    <button @click="test()">test</button>
 </template>
 <script setup lang="ts">
     import Node from "./Node.vue"
     import bfs from "@/algorithms/search/breadthFirst"
     import type { INode } from "../../interfaces/Graph"
     import type { Ref } from "vue"
-    import { ref } from "vue"
-    function test()  {
-        console.log("mouse uping")
-    }
+    import { ref, onMounted, onBeforeMount } from "vue"
+    const newStartNode: Ref<number[]> = ref([6,8])
+    const grid: any = ref(null)
+    const wallMode = ref(false)
     const nodeList: Ref<Array<INode>> = ref([]);
-    const startNodeValue = [6, 8]
-    const startNode:  Ref<Array<number>> = ref(startNodeValue)
+    const startNodeValue = ref([6, 8])
+    const startNode:  Ref<Array<number>> = ref([6,8])
     const endNode: Ref<Array<number>> = ref([10, 16])
     const rows = ref(20);
     const cols = ref(50);
     const toggleWallNode: Ref<boolean> = ref(false);
-    
+
+    function makeNodesDraggable() {
+        if(grid.value) {
+            Array.from(grid.value.children).forEach((child: any, index: number) => {
+                if(child.draggable)
+                    console.log("draggable", child.dataset.row, child.dataset.col)
+                if(child.dataset.isStartNode || child.dataset.isEndNode) {
+                    child.draggable = true
+                } else {
+                    child.draggable = false
+                }
+            })
+        }
+
+    }
+
+    function dragEndHandler() {
+            toggleWallNode.value = false
+            startNode.value = newStartNode.value
+            createNodeList()
+    }
+
+    function dragHandler(e: any){
+            newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+    }
     function makeWallNode(r: number, c: number): void {
         console.log(toggleWallNode.value)
-        if(!toggleWallNode.value) return
+        
+        if(!toggleWallNode.value || !wallMode.value) return
         nodeList.value[cols.value*(r - 1) + c - 1].isWallNode = !nodeList.value[cols.value*(r - 1) + c - 1].isWallNode 
     }
 
-    for(let i = 0; i < rows.value; i++) {
-        for(let j = 0; j < cols.value; j++) {
-            if(i == startNode.value[0] - 1 && j == startNode.value[1] - 1) {
-                nodeList.value.push({isVisited: false, isStartNode: true, isWallNode: false, isEndNode: false, isRoadNode: false, row: i + 1, col: j + 1})
-            }
-            else if(i == endNode.value[0] - 1 && j == endNode.value[1] - 1) {
-                nodeList.value.push({isVisited: false, isStartNode: false, isWallNode: false, isEndNode: true, isRoadNode: false, row: i + 1, col: j + 1})
-            } else {
-                nodeList.value.push({isVisited: false, isStartNode: false, isWallNode: false,isEndNode: false, isRoadNode: false, row: i + 1, col: j  + 1})
+    function createNodeList() {
+        nodeList.value = []
+        for(let i = 0; i < rows.value; i++) {
+            for(let j = 0; j < cols.value; j++) {
+                if(i == startNode.value[0] - 1 && j == startNode.value[1] - 1) {
+                    nodeList.value.push({isVisited: false, isStartNode: true, isWallNode: false, isEndNode: false, isRoadNode: false, row: i + 1, col: j + 1})
+                }
+                else if(i == endNode.value[0] - 1 && j == endNode.value[1] - 1) {
+                    nodeList.value.push({isVisited: false, isStartNode: false, isWallNode: false, isEndNode: true, isRoadNode: false, row: i + 1, col: j + 1})
+                } else {
+                    nodeList.value.push({isVisited: false, isStartNode: false, isWallNode: false,isEndNode: false, isRoadNode: false, row: i + 1, col: j  + 1})
+                }
             }
         }
+
     }
+    createNodeList()
 
     function clearGraph(clearWalls: boolean) {
         nodeList.value.forEach((node) => {
@@ -50,10 +82,14 @@
     }
     function visualizeAlgorithm() {
     clearGraph(false)
-    startNode.value = startNodeValue
+    startNode.value = newStartNode.value
     bfs(startNode, rows, cols, nodeList, endNode)
 
     }
+    
+    onBeforeMount(()=> {
+        makeNodesDraggable()
+    })
 
 </script>
 <style scoped lang="scss">
