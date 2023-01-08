@@ -1,6 +1,6 @@
 <template lang="">
     <div ref="grid" @mousedown="toggleWallNode = true" @mouseup="toggleWallNode = false" class="grid-container">
-       <Node @dragCustom="(n) => dragHandler(n)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+       <Node draggable="true" @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
     </div>
     <button @click="visualizeAlgorithm()">Visualize!</button>
     <button @click="clearGraph(true)">Clear Graph</button>
@@ -20,9 +20,14 @@
     const startNodeValue = ref([6, 8])
     const startNode:  Ref<Array<number>> = ref([6,8])
     const endNode: Ref<Array<number>> = ref([10, 16])
+    const oldStartNode: Ref<Array<number>> = ref([6, 8])
+    const oldEndNode: Ref<Array<number>> = ref([10, 16])
+
+    const newEndNode = ref([10, 16])
     const rows = ref(20);
     const cols = ref(50);
     const toggleWallNode: Ref<boolean> = ref(false);
+    const currentDraggingNode: Ref<string> = ref("")
 
     function makeNodesDraggable() {
         if(grid.value) {
@@ -42,14 +47,47 @@
     function dragEndHandler() {
             toggleWallNode.value = false
             startNode.value = newStartNode.value
-            createNodeList()
+            endNode.value = newEndNode.value
+
+            if(currentDraggingNode.value == "end") {
+                nodeList.value[cols.value*(oldEndNode.value[0] - 1) + oldEndNode.value[1] - 1].isEndNode = false
+                nodeList.value[cols.value*(newEndNode.value[0] - 1) + newEndNode.value[1] - 1].isEndNode = true
+
+            }else if(currentDraggingNode.value == "start") {
+                nodeList.value[cols.value*(oldStartNode.value[0] - 1) + oldStartNode.value[1] - 1].isStartNode = false
+                nodeList.value[cols.value*(newStartNode.value[0] - 1) + newStartNode.value[1] - 1].isStartNode = true
+
+            }
+
+            currentDraggingNode.value = ""
+
+            oldEndNode.value = endNode.value
+            oldStartNode.value = startNode.value
+
     }
 
-    function dragHandler(e: any){
-            newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+    function dragHandler(e: any, f: any){
+            if(currentDraggingNode.value == "start") {
+                newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+            } else if(currentDraggingNode.value == "end"){
+                newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+            }
+    }
+
+    function dragStart(ds: DOMStringMap) {
+        if(ds.isendnode == "true") {
+            currentDraggingNode.value = "end"
+            oldEndNode.value = [parseInt(ds.row!), parseInt(ds.col!)]
+        } else if(ds.isstartnode == "true") {
+            currentDraggingNode.value = ds.isendnode == "true" ? "end" : ds.isstartnode == "true" ? "start" : ""
+            console.log("in start drag", ds.row)
+            oldStartNode.value[0] = parseInt(ds.row!)         
+            oldStartNode.value[1] = parseInt(ds.col!)         
+
+        }
+
     }
     function makeWallNode(r: number, c: number): void {
-        console.log(toggleWallNode.value)
         
         if(!toggleWallNode.value || !wallMode.value) return
         nodeList.value[cols.value*(r - 1) + c - 1].isWallNode = !nodeList.value[cols.value*(r - 1) + c - 1].isWallNode 
@@ -82,14 +120,13 @@
     }
     function visualizeAlgorithm() {
     clearGraph(false)
-    startNode.value = newStartNode.value
     bfs(startNode, rows, cols, nodeList, endNode)
 
     }
     
-    onBeforeMount(()=> {
-        makeNodesDraggable()
-    })
+    // onBeforeMount(()=> {
+    //     makeNodesDraggable()
+    // })
 
 </script>
 <style scoped lang="scss">

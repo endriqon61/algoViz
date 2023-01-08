@@ -1,11 +1,11 @@
 <template lang="">
-    <div :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
+    <div @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
         <div :class="{animation: props.isVisited, road: props.isRoadNode } "></div> 
     </div>
 </template>
 <script setup lang="ts">
    import { ref,  onMounted } from "vue"
-   const emit = defineEmits(['dragCustom', 'wall', 'dragendCustom'])
+   const emit = defineEmits(['dragStartCustom','dragCustom', 'wall', 'dragendCustom'])
    const dragging = ref(true) 
    const nodeElement: any = ref(null)
    const newStartNode: any = ref()
@@ -14,12 +14,15 @@
 
    function dragEndHandler(e: Event) {
         dragging.value = false
-        emit('dragendCustom')
+        emit('dragendCustom', e.currentTarget)
    }
    function dragHandler(e: Event){
         emit("dragCustom", e.currentTarget)
    }
 
+   function dragStart(e: any) {
+        emit("dragStartCustom", e.currentTarget.dataset)
+   }
     function makeWallNode() {
         // dragging.value = false
         emit('wall', props.row, props.col)
