@@ -1,8 +1,9 @@
 <template lang="">
-    <div class="grid-container">
+    <div @mousedown="toggleWallNode = true" @mouseup="toggleWallNode = false" class="grid-container">
        <Node v-for="node in nodeList" @wall="(r, c) => { makeWallNode(r, c) }" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
     </div>
-    <button @click="visualizeAlgorithm()">Visualize</button>
+    <button @click="visualizeAlgorithm()">Visualize!</button>
+    <button @click="clearGraph(true)">Clear Graph</button>
 </template>
 <script setup lang="ts">
     import Node from "./Node.vue"
@@ -10,16 +11,21 @@
     import type { INode } from "../../interfaces/Graph"
     import type { Ref } from "vue"
     import { ref } from "vue"
-    
+    function test()  {
+        console.log("mouse uping")
+    }
     const nodeList: Ref<Array<INode>> = ref([]);
-    const startNode:  Ref<Array<number>> = ref([6, 8])
+    const startNodeValue = [6, 8]
+    const startNode:  Ref<Array<number>> = ref(startNodeValue)
     const endNode: Ref<Array<number>> = ref([10, 16])
-    const rows = ref(15);
-    const cols = ref(30);
+    const rows = ref(20);
+    const cols = ref(50);
+    const toggleWallNode: Ref<boolean> = ref(false);
     
     function makeWallNode(r: number, c: number): void {
-        console.log('Making wall node', r, c)
-        nodeList.value[cols.value*(r - 1) + c - 1].isWallNode = true
+        console.log(toggleWallNode.value)
+        if(!toggleWallNode.value) return
+        nodeList.value[cols.value*(r - 1) + c - 1].isWallNode = !nodeList.value[cols.value*(r - 1) + c - 1].isWallNode 
     }
 
     for(let i = 0; i < rows.value; i++) {
@@ -35,7 +41,16 @@
         }
     }
 
+    function clearGraph(clearWalls: boolean) {
+        nodeList.value.forEach((node) => {
+            node.isRoadNode = false;
+            node.isVisited = false;
+            if(clearWalls) node.isWallNode = false;
+        })
+    }
     function visualizeAlgorithm() {
+    clearGraph(false)
+    startNode.value = startNodeValue
     bfs(startNode, rows, cols, nodeList, endNode)
 
     }
@@ -46,8 +61,8 @@
         display: grid;
         // width: 90vw;
         // height: 90vh;
-        grid-template-columns: repeat(30, auto);
-        grid-template-rows: repeat(15, auto);
+        grid-template-columns: repeat(50, auto);
+        grid-template-rows: repeat(20, auto);
     } 
 
     

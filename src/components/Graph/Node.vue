@@ -1,5 +1,5 @@
 <template lang="">
-    <div @click="makeWallNode()" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
+    <div @mouseover="makeWallNode()" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
         <div :class="{animation: props.isVisited, road: props.isRoadNode } "></div> 
     </div>
 </template>
@@ -20,14 +20,14 @@
 </script>
 <style scoped lang="scss">
     .node {
-        box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.75);
-        -webkit-box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.75);
-        -moz-box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.75);
+        box-shadow: 0px 0px 1px 0px rgba(68, 109, 79, 0.75);
+        -webkit-box-shadow: 0px 0px 1px 0px rgba(50, 100, 64, 0.75);
+        -moz-box-shadow: 0px 0px 1px 0px rgba(45, 126, 68, 0.75);
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 40px;
-        height: 40px;
+        width: 25px;
+        height: 25px;
     } 
 
 
@@ -43,8 +43,8 @@
     }
 
     .animation {
-        width: 5px;
-        height: 5px;
+        width: 2px;
+        height: 2px;
         background-color: pink;
         z-index: -99;
         animation: visitedNode 1s forwards ease-in;
@@ -62,8 +62,8 @@
     }
     @keyframes visitedNode {
        0% {
-        width: 15px;
-        height: 15px;
+        width: 7px;
+        height: 7px;
         background-color: darkblue;
         border-radius: 100%;
        }
