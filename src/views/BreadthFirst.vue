@@ -1,5 +1,6 @@
 <template lang="">
     <div class="container">
+       <p>press "w" to toggle wall drawing mode</p>
        <Grid /> 
     </div>
 </template>

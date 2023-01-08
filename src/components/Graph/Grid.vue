@@ -1,18 +1,17 @@
 <template lang="">
-    <div ref="grid" @mousedown="toggleWallNode = true" @mouseup="toggleWallNode = false" class="grid-container">
+    <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid-container">
        <Node draggable="true" @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
     </div>
     <button @click="visualizeAlgorithm()">Visualize!</button>
     <button @click="clearGraph(true)">Clear Graph</button>
-    <button @click="() => { wallMode = !wallMode; toggleWallNode = false }">Draw a wall</button>
-    <button @click="test()">test</button>
+    <button @click="() => { wallMode = !wallMode }">Draw a wall</button>
 </template>
 <script setup lang="ts">
     import Node from "./Node.vue"
     import bfs from "@/algorithms/search/breadthFirst"
     import type { INode } from "../../interfaces/Graph"
     import type { Ref } from "vue"
-    import { ref, onMounted, onBeforeMount } from "vue"
+    import { ref, onMounted, onUnmounted } from "vue"
     const newStartNode: Ref<number[]> = ref([6,8])
     const grid: any = ref(null)
     const wallMode = ref(false)
@@ -23,29 +22,35 @@
     const oldStartNode: Ref<Array<number>> = ref([6, 8])
     const oldEndNode: Ref<Array<number>> = ref([10, 16])
 
+    function toggleWallNode(e: any) {
+        console.log(e, "keyPressed")
+        if(e.key == "w") {
+            wallMode.value = !wallMode.value
+        }
+    }
+
     const newEndNode = ref([10, 16])
     const rows = ref(20);
     const cols = ref(50);
-    const toggleWallNode: Ref<boolean> = ref(false);
     const currentDraggingNode: Ref<string> = ref("")
 
-    function makeNodesDraggable() {
-        if(grid.value) {
-            Array.from(grid.value.children).forEach((child: any, index: number) => {
-                if(child.draggable)
-                    console.log("draggable", child.dataset.row, child.dataset.col)
-                if(child.dataset.isStartNode || child.dataset.isEndNode) {
-                    child.draggable = true
-                } else {
-                    child.draggable = false
-                }
-            })
-        }
+    
+    // function makeNodesDraggable() {
+    //     if(grid.value) {
+    //         Array.from(grid.value.children).forEach((child: any, index: number) => {
+    //             if(child.draggable)
+    //                 console.log("draggable", child.dataset.row, child.dataset.col)
+    //             if(child.dataset.isStartNode || child.dataset.isEndNode) {
+    //                 child.draggable = true
+    //             } else {
+    //                 child.draggable = false
+    //             }
+    //         })
+    //     }
 
-    }
+    // }
 
     function dragEndHandler() {
-            toggleWallNode.value = false
             startNode.value = newStartNode.value
             endNode.value = newEndNode.value
 
@@ -88,8 +93,7 @@
 
     }
     function makeWallNode(r: number, c: number): void {
-        
-        if(!toggleWallNode.value || !wallMode.value) return
+        if(!wallMode.value) return
         nodeList.value[cols.value*(r - 1) + c - 1].isWallNode = !nodeList.value[cols.value*(r - 1) + c - 1].isWallNode 
     }
 
@@ -118,12 +122,19 @@
             if(clearWalls) node.isWallNode = false;
         })
     }
-    function visualizeAlgorithm() {
+    async function visualizeAlgorithm() {
     clearGraph(false)
-    bfs(startNode, rows, cols, nodeList, endNode)
+    startNode.value = newStartNode.value
+    await bfs(startNode, rows, cols, nodeList, endNode)
 
     }
-    
+    onMounted(() => {
+        window.addEventListener('keypress', toggleWallNode)
+    }) 
+
+    onUnmounted(() => {
+        window.removeEventListener('keypress', toggleWallNode)
+    })
     // onBeforeMount(()=> {
     //     makeNodesDraggable()
     // })
