@@ -1,6 +1,7 @@
 <template lang="">
-    <div @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
-        <div :class="{animation: props.isVisited, road: props.isRoadNode } "></div> 
+    <div :draggable="props.isStartNode || props.isEndNode" @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
+        <span v-if="props.weight > 1" class="weight">{{props.weight}}</span>       
+         <div :class="{animation: props.isVisited, road: props.isRoadNode } "></div> 
     </div>
 </template>
 <script setup lang="ts">
@@ -10,7 +11,7 @@
    const nodeElement: any = ref(null)
    const newStartNode: any = ref()
    const nodeElementWithId: any = document.getElementById("nodeId")
-   const props = defineProps<{isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, row: number, col: number}>() 
+   const props = defineProps<{distance: number, isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, weight: number, row: number, col: number}>() 
 
    function dragEndHandler(e: Event) {
         dragging.value = false
@@ -27,6 +28,7 @@
         // dragging.value = false
         emit('wall', props.row, props.col)
     }
+
     onMounted(() => {
     if (props.isStartNode || props.isEndNode) nodeElement.value.draggable = true
     if(props.isRoadNode) {
@@ -48,6 +50,15 @@
         height: 25px;
     } 
 
+    .weight {
+        position: absolute;
+        font-family: 'Varela Round', sans-serif;
+        font-weight: bold;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        border: 2px solid black;
+    }
 
     .vis {
         background-color: blue;

@@ -10,6 +10,7 @@ import HelloWorld from './components/HelloWorld.vue'
 </template>
 
 <style >
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
   #app {
     display: flex;
     justify-content: center;

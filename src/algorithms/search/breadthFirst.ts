@@ -1,27 +1,28 @@
 import sleep from "@/utils/sleep";
 import type { Ref } from 'vue'
 import type { INode } from '../../interfaces/Graph'
+import { buildRoad, getAdjacentNodes } from "@/utils/graphUtils";
 
-async function buildRoad(ra: string[], nl: Ref<INode[]>, cols: number) {
-    await sleep(1000)
-    for(let roadNode = 1; roadNode < ra.length; roadNode++) {
-        await sleep(75)
-        const cords = ra[roadNode].split(',')
-        const index = cols*(parseInt(cords[0]) - 1) + parseInt(cords[1]) - 1  
-        nl.value[index].isRoadNode = true
-    }
-}
+// async function buildRoad(ra: string[], nl: Ref<INode[]>, cols: number) {
+//     await sleep(1000)
+//     for(let roadNode = 1; roadNode < ra.length; roadNode++) {
+//         await sleep(75)
+//         const cords = ra[roadNode].split(',')
+//         const index = cols*(parseInt(cords[0]) - 1) + parseInt(cords[1]) - 1  
+//         nl.value[index].isRoadNode = true
+//     }
+// }
 
-function createAdjacencyList(node: Array<number>, rows: number, columns: number, nodeList: Ref<INode[]>): Array<number[]> {
-    const arr: Array<number[]> = []
-    const isWallNode = nodeList.value[columns*(node[0] - 1) + node[1] - 1].isWallNode
-    if(!(node[0] == 1) && !isWallNode) arr.push([node[0] - 1, node[1]])
-    if(!(node[1] == columns) && !isWallNode) arr.push([node[0], node[1] + 1])
-    if(!(node[1] == rows) && !isWallNode) arr.push([node[0] + 1, node[1]])
-    if(!(node[1] == 1) && !isWallNode) arr.push([node[0], node[1] - 1])
+// function createAdjacencyList(node: Array<number>, rows: number, columns: number, nodeList: Ref<INode[]>): Array<number[]> {
+//     const arr: Array<number[]> = []
+//     const isWallNode = nodeList.value[columns*(node[0] - 1) + node[1] - 1].isWallNode
+//     if(!(node[0] == 1) && !isWallNode) arr.push([node[0] - 1, node[1]])
+//     if(!(node[1] == columns) && !isWallNode) arr.push([node[0], node[1] + 1])
+//     if(!(node[1] == rows) && !isWallNode) arr.push([node[0] + 1, node[1]])
+//     if(!(node[1] == 1) && !isWallNode) arr.push([node[0], node[1] - 1])
 
-    return arr
-}
+//     return arr
+// }
 export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Ref<number>, nodeList: Ref<INode[]>, e: Ref<number[]>)
 {
     // Mark all the vertices as not visited(By default
@@ -53,7 +54,7 @@ export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Re
                 if(!pred) break
                 u = pred.predecessor
             }
-            await buildRoad(roadArray, nodeList, cols.value)
+            await buildRoad(roadArray, nodeList, cols.value, sleep)
             return
         }
         await sleep(10)
@@ -62,7 +63,7 @@ export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Re
         queue.shift();
         // start node is totalColnumber 
         // cols*y - 1 + x - 1
-        let adj: Array<number[]> = createAdjacencyList(s.value, rows.value, cols.value, nodeList)
+        let adj: Array<number[]> = getAdjacentNodes(s.value, rows.value, cols.value, nodeList.value)
         
         // Get all adjacent vertices of the dequeued
         // vertex s. If a adjacent has not been visited,
@@ -75,7 +76,7 @@ export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Re
             console.log(adjIndex)
             if(!nodeList.value[adjIndex].isVisited)
             {
-                if(nodeList.value[adjIndex].isEndNode == true) {
+                if(nodeList.value[adjIndex].isEndNode) {
                     endFound = true;
                     return; 
                 }

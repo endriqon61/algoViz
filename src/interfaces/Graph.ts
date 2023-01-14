@@ -4,6 +4,8 @@ export interface INode {
     isEndNode: boolean
     isRoadNode: boolean
     isWallNode: boolean
+    distance: number
+    weight: number
     col: number
     row: number
 }
