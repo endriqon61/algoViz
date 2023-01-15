@@ -1,18 +1,8 @@
 import type { Ref } from 'vue'
 import type { INode } from '@/interfaces/Graph';
-import { getAdjacentNodes, buildRoad, generateIndex } from '@/utils/graphUtils';
+import { getAdjacentNodes, buildRoad, generateIndex, findShortestDistanceNode } from '@/utils/graphUtils';
 import  sleep  from '@/utils/sleep'
 
-const findShortestDistanceNode = (graph: Array<INode>): number[] => {
-  let shortestDistanceNode = graph[0]
-
-  for(const node in graph) {
-      if(graph[node].distance < shortestDistanceNode.distance) {
-         shortestDistanceNode = graph[node] 
-      }
-  }
-  return [shortestDistanceNode.row, shortestDistanceNode.col]
-};
 
 
 const dijkstras = async(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) => {
@@ -21,7 +11,7 @@ const dijkstras = async(s: Ref<number[]>, rows: number, cols: number, graph: Ref
 
   for(const node in graph.value) {
 
-    const shortestDistanceNode = graph.value[generateIndex(findShortestDistanceNode(graph.value), cols)]
+    const shortestDistanceNode = graph.value[generateIndex(findShortestDistanceNode(graph.value, false), cols)]
     const adjacentNodes: Array<number[]> = getAdjacentNodes([shortestDistanceNode.row, shortestDistanceNode.col], rows, cols, graph.value) 
     await sleep(1)
     shortestDistanceNode.isVisited = true 

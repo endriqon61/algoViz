@@ -1,7 +1,7 @@
 <template lang="">
     <div class="grid-container">
             <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
-            <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+            <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
             </div>
             <button @click="visualizeAlgorithm()">Visualize!</button>
             <button @click="clearGraph(true)">Clear Graph</button>
@@ -12,6 +12,7 @@
     import Node from "./Node.vue"
     import bfs from "@/algorithms/search/breadthFirst"
     import dijkstras from "@/algorithms/search/dijkstras"
+    import aStar from "@/algorithms/search/aStar"
     import type { INode } from "../../interfaces/Graph"
     import type { Ref } from "vue"
     import { ref, onMounted, onUnmounted } from "vue"
@@ -27,7 +28,6 @@
     const weightMode = ref(false)
 
     function toggleWallNode(e: any) {
-        console.log(e, "keyPressed")
         if(e.key == "w") {
             wallMode.value = !wallMode.value
             weightMode.value = false
@@ -93,7 +93,6 @@
             oldEndNode.value = [parseInt(ds.row!), parseInt(ds.col!)]
         } else if(ds.isstartnode == "true") {
             currentDraggingNode.value = ds.isendnode == "true" ? "end" : ds.isstartnode == "true" ? "start" : ""
-            console.log("in start drag", ds.row)
             oldStartNode.value[0] = parseInt(ds.row!)         
             oldStartNode.value[1] = parseInt(ds.col!)         
 
@@ -109,7 +108,6 @@
         }else if(weightMode.value) {
             node.weight+=2
         }
-        console.log(node)
     }
 
     function createNodeList() {
@@ -117,12 +115,12 @@
         for(let i = 0; i < rows.value; i++) {
             for(let j = 0; j < cols.value; j++) {
                 if(i == startNode.value[0] - 1 && j == startNode.value[1] - 1) {
-                    nodeList.value.push({distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: true, isWallNode: false, isEndNode: false, isRoadNode: false, row: i + 1, col: j + 1})
+                    nodeList.value.push({heuristic: 0, distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: true, isWallNode: false, isEndNode: false, isRoadNode: false, row: i + 1, col: j + 1})
                 }
                 else if(i == endNode.value[0] - 1 && j == endNode.value[1] - 1) {
-                    nodeList.value.push({distance: Number.POSITIVE_INFINITY, weight: 1,  isVisited: false, isStartNode: false, isWallNode: false, isEndNode: true, isRoadNode: false, row: i + 1, col: j + 1})
+                    nodeList.value.push({heuristic: 0, distance: Number.POSITIVE_INFINITY, weight: 1,  isVisited: false, isStartNode: false, isWallNode: false, isEndNode: true, isRoadNode: false, row: i + 1, col: j + 1})
                 } else {
-                    nodeList.value.push({distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: false, isWallNode: false,isEndNode: false, isRoadNode: false, row: i + 1, col: j  + 1})
+                    nodeList.value.push({heuristic: 0,distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: false, isWallNode: false,isEndNode: false, isRoadNode: false, row: i + 1, col: j  + 1})
                 }
             }
         }
@@ -144,7 +142,7 @@
     async function visualizeAlgorithm() {
     clearGraph(false)
     startNode.value = newStartNode.value
-    dijkstras(startNode, rows.value, cols.value, nodeList, endNode)
+    aStar(startNode, rows.value, cols.value, nodeList, endNode)
 
     }
     onMounted(() => {

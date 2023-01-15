@@ -6,6 +6,7 @@ export interface INode {
     isWallNode: boolean
     distance: number
     weight: number
+    heuristic: number
     col: number
     row: number
 }

@@ -1,5 +1,5 @@
 <template lang="">
-    <div :draggable="props.isStartNode || props.isEndNode" @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
+    <div @click="log()" :draggable="props.isStartNode || props.isEndNode" @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
         <span v-if="props.weight > 1" class="weight">{{props.weight}}</span>       
          <div :class="{animation: props.isVisited, road: props.isRoadNode } "></div> 
     </div>
@@ -11,8 +11,14 @@
    const nodeElement: any = ref(null)
    const newStartNode: any = ref()
    const nodeElementWithId: any = document.getElementById("nodeId")
-   const props = defineProps<{distance: number, isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, weight: number, row: number, col: number}>() 
+   const props = defineProps<{heuristic: number, distance: number, isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, weight: number, row: number, col: number}>() 
 
+   function log() {
+    console.log("heurstic")
+    console.log(props.heuristic)
+    console.log('cords')
+    console.log(props.row, props.col)
+   }
    function dragEndHandler(e: Event) {
         dragging.value = false
         emit('dragendCustom', e.currentTarget)
@@ -31,10 +37,7 @@
 
     onMounted(() => {
     if (props.isStartNode || props.isEndNode) nodeElement.value.draggable = true
-    if(props.isRoadNode) {
-    console.log("props ", props) 
 
-    }
    })
    
 </script>
@@ -72,8 +75,8 @@
     }
 
     .animation {
-        width: 2px;
-        height: 2px;
+        width: 10px;
+        height: 10px;
         background-color: pink;
         z-index: -99;
         animation: visitedNode 1s forwards ease-in;
@@ -91,8 +94,8 @@
     }
     @keyframes visitedNode {
        0% {
-        width: 7px;
-        height: 7px;
+        width: 13px;
+        height: 13px;
         background-color: darkblue;
         border-radius: 100%;
        }

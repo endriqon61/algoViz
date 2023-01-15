@@ -15,13 +15,35 @@ export function generateIndex(cords: number[], cols: number): number {
   return cols*(cords[0] - 1) + cords[1] - 1
 }
 
+export const findShortestDistanceNode = (graph: Array<INode>, checkHeuristics: boolean): number[] => {
+  let shortestDistanceNode = graph[0]
+  if(!checkHeuristics) {
+
+    for(const node in graph) {
+        if(graph[node].distance < shortestDistanceNode.distance) {
+            shortestDistanceNode = graph[node] 
+        }
+    }
+
+  } else {
+
+    for(const node in graph) {
+        if(graph[node].distance + graph[node].heuristic < shortestDistanceNode.distance + shortestDistanceNode.heuristic) {
+            shortestDistanceNode = graph[node]
+        }
+    }
+
+  }
+  return [shortestDistanceNode.row, shortestDistanceNode.col]
+};
+
 export function getAdjacentNodes(node: Array<number>, rows: number, columns: number, graph: INode[]): Array<number[]> {
     const arr: Array<number[]> = []
-    if(graph[columns*(node[0] - 1) + node[1] - 1].isWallNode) return [];
+  
     if(!(node[0] == 1)) arr.push([node[0] - 1, node[1]])
     if(!(node[1] == columns)) arr.push([node[0], node[1] + 1])
     if(!(node[0] == rows)) arr.push([node[0] + 1, node[1]])
     if(!(node[1] == 1)) arr.push([node[0], node[1] - 1])
 
-    return arr
+    return arr.filter(el => !graph[generateIndex(el, columns)].isWallNode || graph[generateIndex(el, columns)].isVisited)
 }
