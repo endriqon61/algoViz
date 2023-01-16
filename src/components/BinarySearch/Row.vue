@@ -22,8 +22,8 @@ const props = defineProps<{
 
 const { elements, find } = props
 const list = ref(elements.map(el => { return ({ value: el, isSearching: false }) }))
-let end: Ref<number>;
-let start: Ref<number>;
+let end: Ref<number> = ref(-1);
+let start: Ref<number> = ref(-1);
 
 function selectedClass(el: number): boolean {
     if (el == selected.value) {
@@ -34,8 +34,8 @@ function selectedClass(el: number): boolean {
 
 function visualizeSearch() {
     selected.value = Number.POSITIVE_INFINITY;
-    end = ref(list.value.length - 1)
-    start = ref(0)
+    end.value = list.value.length - 1
+    start.value = 0
     startSearch(selected, start, end, list, find)
 }
 
