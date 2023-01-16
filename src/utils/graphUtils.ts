@@ -28,6 +28,7 @@ export const findShortestDistanceNode = (graph: Array<INode>, checkHeuristics: b
   } else {
 
     for(const node in graph) {
+        if(graph[node].isVisited) continue
         if(graph[node].distance + graph[node].heuristic < shortestDistanceNode.distance + shortestDistanceNode.heuristic) {
             shortestDistanceNode = graph[node]
         }

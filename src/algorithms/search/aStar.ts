@@ -36,24 +36,32 @@ function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
     }
 }
 
+function sortQueueByDistance(queue: INode[]) {
+    queue.sort((a, b) => (b.heuristic + b.distance) - (a.heuristic + a.distance))
+}
+
 export default async function aStar(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) {
     setHeuristics(graph, e.value)
     const startNode = graph.value[generateIndex(s.value, cols)]
     const predecessorList: Array<{node: string, predecessor: string}> = []
     startNode.distance = 0;
-    const queue = [startNode]
+    const queue: INode[] = [startNode]
+    let currentNode: any = startNode
     while(queue.length >= 1) {
 
-        const currentNode = queue.pop()
+        queue.push(graph.value[generateIndex(findShortestDistanceNode(graph.value, true), cols)])
         if(!currentNode) return
+        currentNode.isVisited = true 
 
         const adjacentNodes: Array<number[]> = getAdjacentNodes([currentNode.row, currentNode.col], rows, cols, graph.value) 
+
         await sleep(1)
-        currentNode.isVisited = true 
         for(const adjNode in adjacentNodes) {
+
             predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
             const nodeInGraph = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
             nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
+            queue.unshift(nodeInGraph)
             if(!nodeInGraph.isVisited) queue.unshift(nodeInGraph);
             
             if(nodeInGraph.isEndNode) {
@@ -71,7 +79,9 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
                 return
             }
         }
-    queue.push(graph.value[generateIndex(getClosestAdjacentNode(adjacentNodes, graph, cols), cols)])
+    currentNode = queue.pop()
+    console.log(queue, "queue")
+    sortQueueByDistance(queue)
     }
 }
 
