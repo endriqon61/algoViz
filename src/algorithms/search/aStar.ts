@@ -25,7 +25,7 @@ function getClosestAdjacentNode(adjacentNodes: Array<number[]>, graph: Ref<INode
     if(valueChanged)
         return [currentShortest.row, currentShortest.col]
     else 
-        return []
+        return [89, 68]
 }
 
 function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
@@ -37,7 +37,7 @@ function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
 }
 
 function sortQueueByDistance(queue: INode[]) {
-    queue.sort((a, b) => (b.heuristic + b.distance) - (a.heuristic + a.distance))
+    queue.sort((a, b) => (a.heuristic + a.distance) - (b.heuristic + b.distance))
     console.log("sorted ", queue)
 }
 
@@ -46,11 +46,11 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
     const startNode = graph.value[generateIndex(s.value, cols)]
     const predecessorList: Array<{node: string, predecessor: string}> = []
     startNode.distance = 0;
-    const queue: INode[] = [startNode]
+    let queue: INode[] = [startNode]
     let currentNode: any = startNode
     while(queue.length >= 1) {
 
-        currentNode = queue.pop()
+        currentNode = queue.shift()
 
         if(!currentNode) return
         currentNode.isVisited = true 
@@ -63,7 +63,8 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
             predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
             const nodeInGraph = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
             if(!nodeInGraph.isVisited) nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
-            //queue.unshift(nodeInGraph)
+            else continue
+            queue.unshift(nodeInGraph)
             
             if(nodeInGraph.isEndNode) {
                 let u: string = [...e.value].join();
@@ -81,8 +82,10 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
             }
         }
     currentNode.distance = Number.POSITIVE_INFINITY
-    queue.push(graph.value[generateIndex(findShortestDistanceNode(graph.value, true), cols)])
+    const closestAdjacentNode = graph.value[generateIndex(getClosestAdjacentNode(adjacentNodes, graph, cols), cols)]
+    if(!!closestAdjacentNode) queue.push(closestAdjacentNode)
     sortQueueByDistance(queue)
+    console.log(queue, "queue")
     }
 }
 
