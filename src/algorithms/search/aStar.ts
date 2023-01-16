@@ -37,7 +37,7 @@ function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
 }
 
 function sortQueueByDistance(queue: INode[]) {
-    queue.sort((a, b) => (a.heuristic + a.distance) - (b.heuristic + b.distance))
+    queue.sort((a, b) => (b.heuristic + b.distance) - (a.heuristic + a.distance))
     console.log("sorted ", queue)
 }
 
@@ -50,7 +50,7 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
     let currentNode: any = startNode
     while(queue.length >= 1) {
 
-        currentNode = queue.shift()
+        currentNode = queue.pop()
 
         if(!currentNode) return
         currentNode.isVisited = true 
@@ -64,7 +64,7 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
             const nodeInGraph = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
             if(!nodeInGraph.isVisited) nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
             else continue
-            queue.unshift(nodeInGraph)
+            queue.push(nodeInGraph)
             
             if(nodeInGraph.isEndNode) {
                 let u: string = [...e.value].join();
