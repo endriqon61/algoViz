@@ -16,7 +16,7 @@ function getClosestAdjacentNode(adjacentNodes: Array<number[]>, graph: Ref<INode
             continue
          }
 
-        if(adjNode.heuristic + adjNode.distance < currentShortest.heuristic + currentShortest.distance) {
+        if(adjNode.heuristic < currentShortest.heuristic) {
             currentShortest = adjNode
             valueChanged = true
         }
@@ -38,7 +38,6 @@ function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
 
 function sortQueueByDistance(queue: INode[]) {
     queue.sort((a, b) => (b.heuristic + b.distance) - (a.heuristic + a.distance))
-    console.log("sorted ", queue)
 }
 
 export default async function aStar(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) {
@@ -50,6 +49,8 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
     let currentNode: any = startNode
     while(queue.length >= 1) {
 
+        sortQueueByDistance(queue)
+        console.log([...queue], "queue")
         currentNode = queue.pop()
 
         if(!currentNode) return
@@ -57,15 +58,13 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
 
         const adjacentNodes: Array<number[]> = getAdjacentNodes([currentNode.row, currentNode.col], rows, cols, graph.value) 
 
-        await sleep(1)
+        await sleep(25)
         for(const adjNode in adjacentNodes) {
 
-            predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
             const nodeInGraph = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
-            if(!nodeInGraph.isVisited) nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
-            else continue
-            queue.push(nodeInGraph)
             
+            predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
+            // if(nodeInGraph.isVisited) continue
             if(nodeInGraph.isEndNode) {
                 let u: string = [...e.value].join();
                 const roadArray: string[] = []
@@ -80,12 +79,22 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
                 await buildRoad(roadArray, graph, cols, sleep)
                 return
             }
+
+            if(!queue.includes(nodeInGraph)) 
+            { 
+                queue.push(nodeInGraph)
+                nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
+            
+            }
+
+            if(nodeInGraph.distance >= currentNode.distance + nodeInGraph.weight) {
+                nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
+                predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
+
+            }
+            // queue.push(nodeInGraph)
+            
         }
-    currentNode.distance = Number.POSITIVE_INFINITY
-    const closestAdjacentNode = graph.value[generateIndex(getClosestAdjacentNode(adjacentNodes, graph, cols), cols)]
-    if(!!closestAdjacentNode) queue.push(closestAdjacentNode)
-    sortQueueByDistance(queue)
-    console.log(queue, "queue")
     }
 }
 
