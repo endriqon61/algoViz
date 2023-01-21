@@ -19,16 +19,7 @@ export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Re
     while(queue.length>0)
     {
         if(endFound) {
-            let u: string = [...e.value].join();
-            const roadArray: string[] = []
-            while(u != [...root].join()) {
-                roadArray.push(u)
-                const pred = predecessorList.find(el => el.node == u)
-                console.log('predec')
-                if(!pred) break
-                u = pred.predecessor
-            }
-            await buildRoad(roadArray, nodeList, cols.value, sleep)
+            await buildRoad(nodeList, cols.value, sleep, e.value, predecessorList, s.value)
             return
         }
         await sleep(10)

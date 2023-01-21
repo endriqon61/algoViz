@@ -1,7 +1,9 @@
 <template lang="">
     <div @click="log()" :draggable="props.isStartNode || props.isEndNode" @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
         <span v-if="props.weight > 1" class="weight">{{props.weight}}</span>       
-         <div :class="{animation: props.isVisited, road: props.isRoadNode } "></div> 
+         <div :class="{'animation-visited': props.isVisited, road: props.isRoadNode } "></div> 
+         <img v-if="props.isStartNode" src="/in-love.svg"/>
+         <img v-if="props.isEndNode" src="/cool.svg"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -42,10 +44,13 @@
    
 </script>
 <style scoped lang="scss">
+    * {
+        user-select: none;
+    }
     .node {
-        box-shadow: 0px 0px 1px 0px rgba(68, 109, 79, 0.75);
-        -webkit-box-shadow: 0px 0px 1px 0px rgba(50, 100, 64, 0.75);
-        -moz-box-shadow: 0px 0px 1px 0px rgba(45, 126, 68, 0.75);
+        box-shadow: 0px 0px 1px 0px rgb(123, 123, 123);
+        box-shadow: 0px 0px 1px 0px rgb(123, 123, 123);
+        box-shadow: 0px 0px 1px 0px rgb(123, 123, 123);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -59,22 +64,29 @@
         font-weight: bold;
         width: 100%;
         height: 100%;
+        border-radius: 100%;
+        background-color: darkcyan;
+        color: yellow;
         text-align: center;
+        animation: wallAnimation 600ms ease-in;
         border: 2px solid black;
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
     }
 
     .vis {
         background-color: blue;
     }
     .start {
-        background-color: green;
     }
 
     .end {
-        background-color: red;
     }
 
-    .animation {
+    .animation-visited {
         width: 10px;
         height: 10px;
         background-color: pink;
@@ -90,7 +102,22 @@
         animation: roadNode 500ms forwards ease-in;
     }
     .wall {
-        background-color: black;
+        background-color: rgb(35, 0, 52);
+        animation: wallAnimation 600ms ease-in;
+
+    }
+
+    @keyframes wallAnimation {
+       0% {
+        transform: scale(0.5);
+       }
+       50% {
+        transform: scale(1.3);
+       } 
+
+       100% {
+        transform: scale(1);
+       }
     }
     @keyframes visitedNode {
        0% {

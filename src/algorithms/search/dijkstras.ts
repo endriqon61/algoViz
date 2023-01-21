@@ -19,17 +19,8 @@ const dijkstras = async(s: Ref<number[]>, rows: number, cols: number, graph: Ref
         predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [shortestDistanceNode.row, shortestDistanceNode.col].join()})
         const nodeInGraph = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
         if(nodeInGraph.isEndNode) {
-            let u: string = [...e.value].join();
-            const roadArray: string[] = []
-            console.log("road Array: ", roadArray)
-              while(u != [...s.value].join()) {
-                  roadArray.push(u)
-                  const pred = predecessorList.find(el => el.node == u)
-                  console.log('predec')
-                  if(!pred) break
-                  u = pred.predecessor
-              }
-              await buildRoad(roadArray, graph, cols, sleep)
+          
+              await buildRoad(graph, cols, sleep, s.value, predecessorList, e.value)
               return
         }
         if(!nodeInGraph.isVisited) {

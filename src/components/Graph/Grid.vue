@@ -27,6 +27,8 @@
     const oldEndNode: Ref<Array<number>> = ref([10, 16])
     const weightMode = ref(false)
 
+
+
     function toggleWallNode(e: any) {
         if(e.key == "w") {
             wallMode.value = !wallMode.value

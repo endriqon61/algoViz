@@ -66,17 +66,7 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
             predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
             // if(nodeInGraph.isVisited) continue
             if(nodeInGraph.isEndNode) {
-                let u: string = [...e.value].join();
-                const roadArray: string[] = []
-                console.log("road Array: ", roadArray)
-                while(u != [...s.value].join()) {
-                    roadArray.push(u)
-                    const pred = predecessorList.find(el => el.node == u)
-                    console.log('predec')
-                    if(!pred) break
-                    u = pred.predecessor
-                }
-                await buildRoad(roadArray, graph, cols, sleep)
+                await buildRoad(graph, cols, sleep, e.value, predecessorList, s.value)
                 return
             }
 

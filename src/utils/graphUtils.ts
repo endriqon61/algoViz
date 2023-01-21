@@ -1,11 +1,21 @@
 import type { Ref } from "vue"
 import type { INode } from "@/interfaces/Graph"
 
-export async function buildRoad(ra: string[], nl: Ref<INode[]>, cols: number, sleep: (ms: number)=> Promise<void>) {
+export async function buildRoad(nl: Ref<INode[]>, cols: number, sleep: (ms: number)=> Promise<void>, e: number[], predecessorList: any[], s: number[]) {
     await sleep(1000)
-    for(let roadNode = 1; roadNode < ra.length; roadNode++) {
+    let u: string = [...e].join();
+                const roadArray: string[] = []
+                console.log("road Array: ", roadArray)
+                while(u != [...s].join()) {
+                    roadArray.push(u)
+                    const pred = predecessorList.find(el => el.node == u)
+                    console.log('predec')
+                    if(!pred) break
+                    u = pred.predecessor
+                }
+    for(let roadNode = 1; roadNode < roadArray.length; roadNode++) {
         await sleep(75)
-        const cords = ra[roadNode].split(',')
+        const cords = roadArray[roadNode].split(',')
         const index = cols*(parseInt(cords[0]) - 1) + parseInt(cords[1]) - 1  
         nl.value[index].isRoadNode = true
     }

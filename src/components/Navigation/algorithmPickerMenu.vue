@@ -1,10 +1,13 @@
 <template>
     <div class="menu-container">
-        <div class="dropdown-btn">
-            <div v-for="option in options" @click="setSelectedAlgorithm(option)" class="options">
-                {{ option.algorithm }}
+        <div @click="() => { showDropDown = !showDropDown }" class="dropdown-btn">O
+            <div v-if="showDropDown" class="dropdown-menu">
+                <div v-for="option in options" @click="setSelectedAlgorithm(option)" class="options">
+                    {{ option }}
+                </div>
             </div>
         </div>
+       
         <button @click="$emit('visualize', selectedAlgorithm)">
             Visualize {{ selectedAlgorithm }}
         </button>
@@ -12,25 +15,45 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref,computed } from "vue"
+    import { ref, onMounted, computed } from "vue"
     import type { Ref, ComputedRef} from "vue"
-    interface Option {
-        algorithm: string,
-        id: number
-    }
-
-    function setSelectedAlgorithm(option: Option) {
-        selectedAlgorithm.value = option.algorithm
-    }
-
+   
     const selectedAlgorithm: Ref<string> = ref('')
+    const showDropDown: Ref<boolean> = ref(false)
+
+    function setSelectedAlgorithm(option: string) {
+        selectedAlgorithm.value = option
+    }
+
 
     
 
-    const { options } = defineProps<{options: Option[]}>()
+    const { options } = defineProps<{options: string[]}>()
+
+    onMounted(() => {
+        console.log("options", options)
+    })
 
 </script>
 
 <style lang="scss" scoped>
+   
+   
+    .dropdown-btn {
 
+    }
+    .dropdown-menu {
+
+        position: absolute;
+        bottom: 0;
+        transform: translateY(100%);
+    }
+    .menu-container {
+        width: 100vw;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+    }
 </style>
