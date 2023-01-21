@@ -8,7 +8,21 @@
 <script setup lang="ts">
     import Grid from "../components/Graph/Grid.vue"
     import AlgorithmPickerMenu from "@/components/Navigation/algorithmPickerMenu.vue";
+    import { ref } from "vue"
+    import type { Ref } from "vue"
+    import type { INode } from "@/interfaces/Graph";
 
+    const newStartNode: Ref<number[]> = ref([6,8])
+    const grid: any = ref(null)
+    const wallMode = ref(false)
+    const nodeList: Ref<Array<INode>> = ref([]);
+    const startNodeValue = ref([6, 8])
+    const startNode:  Ref<Array<number>> = ref([6,8])
+    const endNode: Ref<Array<number>> = ref([10, 16])
+    const oldStartNode: Ref<Array<number>> = ref([6, 8])
+    const oldEndNode: Ref<Array<number>> = ref([10, 16])
+    const weightMode = ref(false)
+    
     function testFunc() {
 
     }

@@ -1,4 +1,5 @@
 <template lang="">
+    <AlgorithmPickerMenu class="menu" @visualize="(e) => visualizeAlgorithm(e)" :options="options"/>
     <div class="grid-container">
             <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
             <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
@@ -12,20 +13,25 @@
     import Node from "./Node.vue"
     import bfs from "@/algorithms/search/breadthFirst"
     import dijkstras from "@/algorithms/search/dijkstras"
+    import AlgorithmPickerMenu from "../Navigation/algorithmPickerMenu.vue"
     import aStar from "@/algorithms/search/aStar"
     import type { INode } from "../../interfaces/Graph"
     import type { Ref } from "vue"
     import { ref, onMounted, onUnmounted } from "vue"
+import sleep from "@/utils/sleep"
+
+    
+
     const newStartNode: Ref<number[]> = ref([6,8])
-    const grid: any = ref(null)
     const wallMode = ref(false)
     const nodeList: Ref<Array<INode>> = ref([]);
-    const startNodeValue = ref([6, 8])
     const startNode:  Ref<Array<number>> = ref([6,8])
     const endNode: Ref<Array<number>> = ref([10, 16])
     const oldStartNode: Ref<Array<number>> = ref([6, 8])
     const oldEndNode: Ref<Array<number>> = ref([10, 16])
     const weightMode = ref(false)
+
+    const options =  ["Bfs", "dijkstras", "aStar"]
 
 
 
@@ -44,21 +50,6 @@
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
 
-    
-    // function makeNodesDraggable() {
-    //     if(grid.value) {
-    //         Array.from(grid.value.children).forEach((child: any, index: number) => {
-    //             if(child.draggable)
-    //                 console.log("draggable", child.dataset.row, child.dataset.col)
-    //             if(child.dataset.isStartNode || child.dataset.isEndNode) {
-    //                 child.draggable = true
-    //             } else {
-    //                 child.draggable = false
-    //             }
-    //         })
-    //     }
-
-    // }
 
     function dragEndHandler() {
             startNode.value = newStartNode.value
@@ -141,10 +132,17 @@
             }
         })
     }
-    async function visualizeAlgorithm() {
-    clearGraph(false)
-    startNode.value = newStartNode.value
-    aStar(startNode, rows.value, cols.value, nodeList, endNode)
+    async function visualizeAlgorithm(e: any) {
+        console.log("eeeee", e)
+        clearGraph(false)
+        startNode.value = newStartNode.value
+        if(e == "aStar") {
+            aStar(startNode, rows.value, cols.value, nodeList, endNode)
+        } else if (e == "dijkstras") {
+            dijkstras(startNode, rows.value, cols.value, nodeList, endNode)
+        } else if(e == "Bfs") {
+            bfs(startNode, rows, cols, nodeList, endNode)
+        }
 
     }
     onMounted(() => {
@@ -172,5 +170,7 @@
         grid-template-rows: repeat(20, auto);
     } 
 
-    
+   .menu {
+        z-index: 900000000;
+   } 
 </style>

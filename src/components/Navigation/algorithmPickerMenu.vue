@@ -8,16 +8,22 @@
             </div>
         </div>
        
-        <button @click="$emit('visualize', selectedAlgorithm)">
+        <button @click="visualize">
             Visualize {{ selectedAlgorithm }}
         </button>
     </div>
 </template>
 
 <script lang="ts" setup>
-    import { ref, onMounted, computed } from "vue"
+    import { ref, defineEmits, onMounted, computed } from "vue"
     import type { Ref, ComputedRef} from "vue"
-   
+    
+    const emit = defineEmits(['visualize'])
+
+    function visualize() {
+        console.log("visualizing")
+        emit('visualize', selectedAlgorithm.value)
+    }
     const selectedAlgorithm: Ref<string> = ref('')
     const showDropDown: Ref<boolean> = ref(false)
 

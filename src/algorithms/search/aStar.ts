@@ -40,6 +40,23 @@ function sortQueueByDistance(queue: INode[]) {
     queue.sort((a, b) => (b.heuristic + b.distance) - (a.heuristic + a.distance))
 }
 
+function findAndRemoveShortestDistanceNode(queue: INode[]) {
+    let currentShortest: INode = queue[0];
+
+    for(let node of queue){
+        if(node.isVisited) continue
+        if(currentShortest.distance + currentShortest.heuristic > node.distance + node.heuristic) {
+            currentShortest = node
+        } else if(currentShortest.distance + currentShortest.heuristic === node.distance + node.heuristic
+            && currentShortest.heuristic > node.heuristic) {
+            currentShortest = node
+        }
+    }
+
+    queue.splice(queue.indexOf(currentShortest), 1)
+    return currentShortest;
+}
+
 export default async function aStar(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) {
     setHeuristics(graph, e.value)
     const startNode = graph.value[generateIndex(s.value, cols)]
@@ -49,9 +66,8 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
     let currentNode: any = startNode
     while(queue.length >= 1) {
 
-        sortQueueByDistance(queue)
+        currentNode = findAndRemoveShortestDistanceNode(queue)
         console.log([...queue], "queue")
-        currentNode = queue.pop()
 
         if(!currentNode) return
         currentNode.isVisited = true 
@@ -61,28 +77,41 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
         await sleep(25)
         for(const adjNode in adjacentNodes) {
 
-            const nodeInGraph = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
-            
-            predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
-            // if(nodeInGraph.isVisited) continue
-            if(nodeInGraph.isEndNode) {
+            const neighbor = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
+            const nodeInQueueWithSamePositionExists = queue.some(node => [node.row, node.col].join() === [neighbor.row, neighbor.col].join()) 
+            const nodeInQueueWithSamePosition = queue.find(node => [node.row, node.col].join() === [neighbor.row, neighbor.col].join())
+
+            if(neighbor.isEndNode) {
+                neighbor.parent = currentNode
+                let node = neighbor;
+
+
+                while(node.parent) {
+                    console.log("node parent", node, node.parent)
+                    predecessorList.push({node: [node.row, node.col].join(), predecessor: [node.parent.row, node.parent.col].join()})
+                    node = node.parent
+                }
+                console.log(predecessorList, "predList")
                 await buildRoad(graph, cols, sleep, e.value, predecessorList, s.value)
                 return
             }
 
-            if(!queue.includes(nodeInGraph)) 
+            if(!queue.includes(neighbor)) 
             { 
-                queue.push(nodeInGraph)
-                nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
-            
+                neighbor.distance = currentNode.distance + neighbor.weight
+                neighbor.parent = currentNode
+                queue.push(neighbor)
             }
 
-            if(nodeInGraph.distance >= currentNode.distance + nodeInGraph.weight) {
-                nodeInGraph.distance = currentNode.distance + nodeInGraph.weight
-                predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [currentNode.row, currentNode.col].join()})
+            if(nodeInQueueWithSamePositionExists) {
+                if(neighbor.distance + neighbor.heuristic > currentNode.distance + currentNode.heuristic) {
+                    neighbor!.distance = currentNode.distance + neighbor.weight
+                    nodeInQueueWithSamePosition!.distance = currentNode.distance + neighbor.weight
+                    neighbor.parent = currentNode
+                    nodeInQueueWithSamePosition!.parent = currentNode
+                }
 
             }
-            // queue.push(nodeInGraph)
             
         }
     }

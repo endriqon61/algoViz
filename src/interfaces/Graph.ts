@@ -7,6 +7,7 @@ export interface INode {
     distance: number
     weight: number
     heuristic: number
+    parent?: INode
     col: number
     row: number
 }

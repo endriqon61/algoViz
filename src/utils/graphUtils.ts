@@ -3,17 +3,24 @@ import type { INode } from "@/interfaces/Graph"
 
 export async function buildRoad(nl: Ref<INode[]>, cols: number, sleep: (ms: number)=> Promise<void>, e: number[], predecessorList: any[], s: number[]) {
     await sleep(1000)
+    console.log(s, "start", e, "end")
+    console.log("start", predecessorList)
     let u: string = [...e].join();
                 const roadArray: string[] = []
-                console.log("road Array: ", roadArray)
                 while(u != [...s].join()) {
                     roadArray.push(u)
                     const pred = predecessorList.find(el => el.node == u)
-                    console.log('predec')
-                    if(!pred) break
+                    console.log("pred", pred)
+                    console.log('predec', u, pred.predecessor)
+                    // if(!pred) {
+                    //     console.log("wtfFFFFFFFFFFFFFFFFF") 
+                    //     break
+                    //   }
                     u = pred.predecessor
                 }
-    for(let roadNode = 1; roadNode < roadArray.length; roadNode++) {
+                console.log("road Array: ", roadArray)
+                roadArray.reverse()
+    for(let roadNode = 0; roadNode < roadArray.length; roadNode++) {
         await sleep(75)
         const cords = roadArray[roadNode].split(',')
         const index = cols*(parseInt(cords[0]) - 1) + parseInt(cords[1]) - 1  

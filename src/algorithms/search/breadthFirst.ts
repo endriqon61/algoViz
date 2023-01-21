@@ -15,21 +15,22 @@ export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Re
     let endFound: boolean = false;     
 
     const predecessorList: Array<{node: string, predecessor: string}> = []
-
+    let currentNode = s.value;
     while(queue.length>0)
     {
         if(endFound) {
+            console.log(predecessorList, "predList bfs")
             await buildRoad(nodeList, cols.value, sleep, e.value, predecessorList, s.value)
             return
         }
         await sleep(10)
-        s.value = queue[0];
+        currentNode = queue[0];
         queue.shift();
-        let adj: Array<number[]> = getAdjacentNodes(s.value, rows.value, cols.value, nodeList.value)
+        let adj: Array<number[]> = getAdjacentNodes(currentNode, rows.value, cols.value, nodeList.value)
         
         adj.forEach((adjacent) => {
             const adjIndex = cols.value*(adjacent[0] - 1) + adjacent[1] - 1
-            predecessorList.push({node: [...adjacent].join(), predecessor: [...s.value].join()})
+            predecessorList.push({node: [...adjacent].join(), predecessor: [...currentNode].join()})
             if(adjIndex < 0 || adjIndex > rows.value * cols.value - 1) return
             console.log(adjIndex)
             if(!nodeList.value[adjIndex].isVisited)

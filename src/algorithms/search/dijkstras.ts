@@ -20,7 +20,7 @@ const dijkstras = async(s: Ref<number[]>, rows: number, cols: number, graph: Ref
         const nodeInGraph = graph.value[generateIndex(adjacentNodes[adjNode], cols)]
         if(nodeInGraph.isEndNode) {
           
-              await buildRoad(graph, cols, sleep, s.value, predecessorList, e.value)
+              await buildRoad(graph, cols, sleep, e.value, predecessorList, s.value)
               return
         }
         if(!nodeInGraph.isVisited) {
