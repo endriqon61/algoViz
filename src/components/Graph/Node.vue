@@ -65,11 +65,11 @@
         width: 100%;
         height: 100%;
         border-radius: 100%;
-        background-color: darkcyan;
-        color: yellow;
+        background-color: rgb(154, 225, 255);
+        color: black;
         text-align: center;
         animation: wallAnimation 600ms ease-in;
-        border: 2px solid black;
+        border: 1px solid black;
     }
 
     img {
@@ -77,9 +77,7 @@
         height: 100%;
     }
 
-    .vis {
-        background-color: blue;
-    }
+  
     .start {
     }
 
@@ -87,15 +85,16 @@
     }
 
     .animation-visited {
-        width: 10px;
-        height: 10px;
+        width: 100%;
+        height: 100%;
         background-color: pink;
         z-index: -99;
-        animation: visitedNode 1s forwards ease-in;
+        animation: visitedNode 600ms forwards ease-in;
     }
 
     .road {
-        background-color: yellow;
+        background-color: rgb(207, 207, 207);
+       
         z-index: 100;
         width: 100%;
         height: 100%;
@@ -121,38 +120,33 @@
     }
     @keyframes visitedNode {
        0% {
-        width: 13px;
-        height: 13px;
-        background-color: darkblue;
+        transform: scale(0.2);
+        background-color: rgb(73, 0, 1);
         border-radius: 100%;
        }
         50% {
         border-radius: 50%;
-        background-color: blue;
+        background-color: rgb(171, 22, 47);
         }
         80% {
-            background-color: lightgreen;
+            background-color: rgb(253, 180, 194);
+            transform: scale(1.2); 
         }
         100% {
-        background-color: lightblue;
+        background-color: rgb(209, 25, 255);
         border-radius: 0;
-        width: calc(100% + 1px);
-        height: calc(100% + 1px);
-
+        transform: scale(1);
        }
     }
     @keyframes roadNode {
         0% {
-        background-color: yellow;
            transform: scale(0) 
         }
         80% {
-        background-color: yellow;
             transform: scale(1.25)
 
         }
         100% {
-        background-color: yellow;
             transform: scale(1)
         }
     }

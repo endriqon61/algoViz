@@ -4,30 +4,6 @@ import sleep from '@/utils/sleep'
 import type { Ref } from 'vue'
 import type { INode } from '@/interfaces/Graph'
 
-function getClosestAdjacentNode(adjacentNodes: Array<number[]>, graph: Ref<INode[]>, cols: number): number[] {
-
-
-    let currentShortest = {heuristic: Number.POSITIVE_INFINITY, distance: Number.POSITIVE_INFINITY, row: 700, col: 800}
-    let valueChanged = false 
-    for(let adjNodeIndex in adjacentNodes) {
-        const  adjNode = graph.value[generateIndex(adjacentNodes[adjNodeIndex], cols)]
-        if(adjNode.isWallNode || adjNode.isVisited)  {
-            console.log('visited') 
-            continue
-         }
-
-        if(adjNode.heuristic < currentShortest.heuristic) {
-            currentShortest = adjNode
-            valueChanged = true
-        }
-    }
-    console.log("current shortest", currentShortest)
-    if(valueChanged)
-        return [currentShortest.row, currentShortest.col]
-    else 
-        return [89, 68]
-}
-
 function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
     for(let nodeIndex in graph.value) {
         
@@ -36,9 +12,7 @@ function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
     }
 }
 
-function sortQueueByDistance(queue: INode[]) {
-    queue.sort((a, b) => (b.heuristic + b.distance) - (a.heuristic + a.distance))
-}
+
 
 function findAndRemoveShortestDistanceNode(queue: INode[]) {
     let currentShortest: INode = queue[0];

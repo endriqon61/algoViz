@@ -1,24 +1,23 @@
 <template lang="">
-    <AlgorithmPickerMenu class="menu" @visualize="(e) => visualizeAlgorithm(e)" :options="options"/>
-    <div class="grid-container">
-            <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
-            <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
-            </div>
-            <button @click="visualizeAlgorithm()">Visualize!</button>
-            <button @click="clearGraph(true)">Clear Graph</button>
-            <button @click="() => { wallMode = !wallMode }">Draw a wall</button>
+    <div class="main-container">
+        <AlgorithmPickerMenu class="menu" @clearGraph="() => {clearGraph(true)}" @visualize="(e) => visualizeAlgorithm(e)" menu-type="pathfinding" :options="options"/>
+        <div class="grid-container">
+                <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
+                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+                </div>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
-    import Node from "./Node.vue"
+    import Node from "../components/Graph/Node.vue"
     import bfs from "@/algorithms/search/breadthFirst"
     import dijkstras from "@/algorithms/search/dijkstras"
-    import AlgorithmPickerMenu from "../Navigation/algorithmPickerMenu.vue"
+    import AlgorithmPickerMenu from "../components/Navigation/AlgorithmPickerMenu.vue"
     import aStar from "@/algorithms/search/aStar"
-    import type { INode } from "../../interfaces/Graph"
+    import type { INode } from "../interfaces/Graph"
     import type { Ref } from "vue"
     import { ref, onMounted, onUnmounted } from "vue"
-import sleep from "@/utils/sleep"
+    import sleep from "@/utils/sleep"
 
     
 
@@ -30,6 +29,8 @@ import sleep from "@/utils/sleep"
     const oldStartNode: Ref<Array<number>> = ref([6, 8])
     const oldEndNode: Ref<Array<number>> = ref([10, 16])
     const weightMode = ref(false)
+
+    const ac = new AbortController()
 
     const options =  ["Bfs", "dijkstras", "aStar"]
 
@@ -52,6 +53,14 @@ import sleep from "@/utils/sleep"
 
 
     function dragEndHandler() {
+
+            if(nodeList.value[cols.value*(newStartNode.value[0] - 1) + newStartNode.value[1] - 1].isWallNode) {
+                newStartNode.value = oldStartNode.value
+                return
+            } else if (nodeList.value[cols.value*(newEndNode.value[0] - 1) + newEndNode.value[1] - 1].isWallNode) {
+                newEndNode.value = oldEndNode.value
+                return
+            }
             startNode.value = newStartNode.value
             endNode.value = newEndNode.value
 
@@ -94,12 +103,14 @@ import sleep from "@/utils/sleep"
     }
     function makeWallNode(r: number, c: number): void {
         const node = nodeList.value[cols.value*(r - 1) + c - 1]
-        if(node.isEndNode || node.isStartNode) return
+        if(node.isEndNode || node.isStartNode || node.weight > 1) return
 
         if(wallMode.value) {
             node.isWallNode = !node.isWallNode
         }else if(weightMode.value) {
-            node.weight+=2
+            if(!node.isWallNode) {
+                node.weight+=2
+            }
         }
     }
 
@@ -160,15 +171,21 @@ import sleep from "@/utils/sleep"
 <style scoped lang="scss">
     .grid-container {
         display: flex;
+        width: auto;
         flex-direction: column;
     }
     .grid {
         display: grid;
-        // width: 90vw;
-        // height: 90vh;
         grid-template-columns: repeat(50, auto);
         grid-template-rows: repeat(20, auto);
     } 
+    .main-container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
    .menu {
         z-index: 900000000;

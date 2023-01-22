@@ -5,15 +5,23 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <template>
 <div class="container">
-  <RouterView />
+  <RouterView class="router"/>
 </div>
 </template>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
-
+  .router {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+  }
   * {
     user-select: none;
+  }
+  .container {
+    width: 100vw;
+    height: 100vh;
   }
   #app {
     display: flex;

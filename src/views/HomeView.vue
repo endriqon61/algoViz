@@ -7,7 +7,7 @@
   <div class="router-links">
     <router-link to="/binarySearch">binarySearch</router-link>
     <router-link to="/bubbleSort">bubbleSort</router-link>
-    <router-link to="/breadthFirstSearch">BreadthFirst</router-link>
+    <router-link to="/pathfinding">Pathfinding Algorithms</router-link>
   </div>
   </main>
 

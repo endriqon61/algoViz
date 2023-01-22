@@ -7,18 +7,27 @@
                 </div>
             </div>
         </div>
-       
-        <button @click="visualize">
-            Visualize {{ selectedAlgorithm }}
-        </button>
+        
+        <div class="buttons">
+            <button @click="clearGraph">
+                Clear Walls And Weights
+            </button>
+            <button @click="visualize">
+                Visualize {{ selectedAlgorithm }}{{ selectedAlgorithm ? '!' : '' }}
+            </button>
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-    import { ref, defineEmits, onMounted, computed } from "vue"
+    import { ref,  onMounted, computed } from "vue"
     import type { Ref, ComputedRef} from "vue"
     
-    const emit = defineEmits(['visualize'])
+    const emit = defineEmits(['visualize' , 'clearGraph'])
+
+    function clearGraph() {
+        emit('clearGraph')
+    }
 
     function visualize() {
         console.log("visualizing")
@@ -26,6 +35,7 @@
     }
     const selectedAlgorithm: Ref<string> = ref('')
     const showDropDown: Ref<boolean> = ref(false)
+    type menuType = 'pathfinding' | 'sorting' | 'searching'
 
     function setSelectedAlgorithm(option: string) {
         selectedAlgorithm.value = option
@@ -34,7 +44,7 @@
 
     
 
-    const { options } = defineProps<{options: string[]}>()
+    const { options, type} = defineProps<{options: string[], type: menuType}>()
 
     onMounted(() => {
         console.log("options", options)
@@ -44,7 +54,12 @@
 
 <style lang="scss" scoped>
    
-   
+    .buttons {
+        display: flex;
+        >button {
+            margin: 5px;
+        }
+    }
     .dropdown-btn {
 
     }
