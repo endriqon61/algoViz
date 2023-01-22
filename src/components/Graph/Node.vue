@@ -13,7 +13,10 @@
    const nodeElement: any = ref(null)
    const newStartNode: any = ref()
    const nodeElementWithId: any = document.getElementById("nodeId")
-   const props = defineProps<{heuristic: number, distance: number, isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, weight: number, row: number, col: number}>() 
+   const props = defineProps<{
+    heuristic: number,
+    distance: number,
+    isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, weight: number, row: number, col: number}>() 
 
    function log() {
     console.log("heurstic")

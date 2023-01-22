@@ -13,12 +13,12 @@
     import bfs from "@/algorithms/search/breadthFirst"
     import dijkstras from "@/algorithms/search/dijkstras"
     import AlgorithmPickerMenu from "../components/Navigation/AlgorithmPickerMenu.vue"
-    import aStar from "@/algorithms/search/aStar"
+    import aStar, { aStarSync } from "@/algorithms/search/aStar"
     import type { INode } from "../interfaces/Graph"
     import type { Ref } from "vue"
     import { ref, onMounted, onUnmounted } from "vue"
     import sleep from "@/utils/sleep"
-
+    import { generateIndex } from "@/utils/graphUtils"
     
 
     const newStartNode: Ref<number[]> = ref([6,8])
@@ -29,6 +29,7 @@
     const oldStartNode: Ref<Array<number>> = ref([6, 8])
     const oldEndNode: Ref<Array<number>> = ref([10, 16])
     const weightMode = ref(false)
+    const nodeListTest: INode[] = []
 
     const ac = new AbortController()
 
@@ -83,9 +84,21 @@
 
     function dragHandler(e: any, f: any){
             if(currentDraggingNode.value == "start") {
-                newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                if(newStartNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
+                    clearGraph(false)
+                    const nodesToAnimate = aStarSync(newStartNode, rows.value, cols.value, nodeListTest, endNode)
+                    newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                }
             } else if(currentDraggingNode.value == "end"){
-                newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                
+                if(newEndNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
+                    clearGraph(false)
+                    const nodesToAnimate = aStarSync(startNode, rows.value, cols.value, nodeListTest, newEndNode)
+                    nodesToAnimate?.forEach(node => {
+                        nodeList.value[generateIndex([node.row, node.col], cols.value)].isVisited = true
+                    })
+                    newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                }
             }
     }
 
@@ -120,11 +133,15 @@
             for(let j = 0; j < cols.value; j++) {
                 if(i == startNode.value[0] - 1 && j == startNode.value[1] - 1) {
                     nodeList.value.push({heuristic: 0, distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: true, isWallNode: false, isEndNode: false, isRoadNode: false, row: i + 1, col: j + 1})
+                    nodeListTest.push({heuristic: 0, distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: true, isWallNode: false, isEndNode: false, isRoadNode: false, row: i + 1, col: j + 1})
+
                 }
                 else if(i == endNode.value[0] - 1 && j == endNode.value[1] - 1) {
                     nodeList.value.push({heuristic: 0, distance: Number.POSITIVE_INFINITY, weight: 1,  isVisited: false, isStartNode: false, isWallNode: false, isEndNode: true, isRoadNode: false, row: i + 1, col: j + 1})
+                    nodeListTest.push({heuristic: 0, distance: Number.POSITIVE_INFINITY, weight: 1,  isVisited: false, isStartNode: false, isWallNode: false, isEndNode: true, isRoadNode: false, row: i + 1, col: j + 1})
                 } else {
                     nodeList.value.push({heuristic: 0,distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: false, isWallNode: false,isEndNode: false, isRoadNode: false, row: i + 1, col: j  + 1})
+                    nodeListTest.push({heuristic: 0,distance: Number.POSITIVE_INFINITY, weight: 1, isVisited: false, isStartNode: false, isWallNode: false,isEndNode: false, isRoadNode: false, row: i + 1, col: j  + 1})
                 }
             }
         }
@@ -134,11 +151,17 @@
 
     function clearGraph(clearWalls: boolean) {
         nodeList.value.forEach((node) => {
+            const testNode = nodeListTest[generateIndex([node.row, node.col], cols.value)]
+            testNode.isRoadNode = false
             node.isRoadNode = false;
+            testNode.isVisited = false;
             node.isVisited = false;
+            testNode.distance = Number.POSITIVE_INFINITY;
             node.distance = Number.POSITIVE_INFINITY;
             if(clearWalls) {
+                testNode.isWallNode = false
                 node.isWallNode = false
+                testNode.weight = 1
                 node.weight = 1
             }
         })

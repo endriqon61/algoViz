@@ -3,11 +3,12 @@ import sleep from '@/utils/sleep'
 
 import type { Ref } from 'vue'
 import type { INode } from '@/interfaces/Graph'
+import { reactive } from 'vue'
 
-function setHeuristics(graph: Ref<INode[]>, e: number[]): void {
-    for(let nodeIndex in graph.value) {
+function setHeuristics(graph: INode[], e: number[]): void {
+    for(let nodeIndex in graph) {
         
-        const node = graph.value[nodeIndex] 
+        const node = graph[nodeIndex] 
         node.heuristic = Math.abs((node.row - e[0])) + Math.abs((node.col - e[1]))
     }
 }
@@ -31,8 +32,73 @@ function findAndRemoveShortestDistanceNode(queue: INode[]) {
     return currentShortest;
 }
 
-export default async function aStar(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) {
+export function aStarSync(s: Ref<number[]>, rows: number, cols: number, graph: INode[], e: Ref<number[]>) {
+
     setHeuristics(graph, e.value)
+
+
+    const nodesToAnimate: any[] = []
+    const startNode = graph[generateIndex(s.value, cols)]
+    const predecessorList: Array<{node: string, predecessor: string}> = []
+    startNode.distance = 0;
+    let queue: INode[] = [startNode]
+    let currentNode: any = startNode
+    while(queue.length >= 1) {
+
+        currentNode = findAndRemoveShortestDistanceNode(queue)
+
+        if(!currentNode) return
+        currentNode.isVisited = true 
+        nodesToAnimate.push(currentNode)
+
+        const adjacentNodes: Array<number[]> = getAdjacentNodes([currentNode.row, currentNode.col], rows, cols, graph) 
+
+        
+        for(const adjNode in adjacentNodes) {
+
+            const neighbor = graph[generateIndex(adjacentNodes[adjNode], cols)]
+            const nodeInQueueWithSamePositionExists = queue.some(node => [node.row, node.col].join() === [neighbor.row, neighbor.col].join()) 
+            const nodeInQueueWithSamePosition = queue.find(node => [node.row, node.col].join() === [neighbor.row, neighbor.col].join())
+
+            if(neighbor.isEndNode) {
+                neighbor.parent = currentNode
+                let node = neighbor;
+
+
+                while(node.parent) {
+                    predecessorList.push({node: [node.row, node.col].join(), predecessor: [node.parent.row, node.parent.col].join()})
+                    node = node.parent
+                }
+                // await buildRoad(graph, cols, sleep, e.value, predecessorList, s.value)
+                console.log("nodes to animate", nodesToAnimate)
+                return nodesToAnimate
+            }
+
+            if(!queue.includes(neighbor)) 
+            { 
+                neighbor.distance = currentNode.distance + neighbor.weight
+                neighbor.parent = currentNode
+                queue.push(neighbor)
+            }
+
+            if(nodeInQueueWithSamePositionExists) {
+                if(neighbor.distance + neighbor.heuristic > currentNode.distance + currentNode.heuristic) {
+                    neighbor!.distance = currentNode.distance + neighbor.weight
+                    nodeInQueueWithSamePosition!.distance = currentNode.distance + neighbor.weight
+                    neighbor.parent = currentNode
+                    nodeInQueueWithSamePosition!.parent = currentNode
+                }
+
+            }
+            
+        }
+    }
+
+    return nodesToAnimate
+}
+
+export default async function aStar(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) {
+    setHeuristics(graph.value, e.value)
     const startNode = graph.value[generateIndex(s.value, cols)]
     const predecessorList: Array<{node: string, predecessor: string}> = []
     startNode.distance = 0;
