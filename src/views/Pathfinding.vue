@@ -3,7 +3,7 @@
         <AlgorithmPickerMenu class="menu" @clearGraph="() => {clearGraph(true)}" @visualize="(e) => visualizeAlgorithm(e)" menu-type="pathfinding" :options="options"/>
         <div class="grid-container">
                 <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
-                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :toggleAnimation="toggleAnimation" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
                 </div>
         </div>
     </div>
@@ -30,6 +30,7 @@
     const oldEndNode: Ref<Array<number>> = ref([10, 16])
     const weightMode = ref(false)
     const nodeListTest: INode[] = []
+    const toggleAnimation: Ref<boolean> = ref(false)
 
     const ac = new AbortController()
 
@@ -83,6 +84,7 @@
     }
 
     function dragHandler(e: any, f: any){
+            toggleAnimation.value = false
             if(currentDraggingNode.value == "start") {
                 if(newStartNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
                     clearGraph(false)
@@ -151,17 +153,16 @@
 
     function clearGraph(clearWalls: boolean) {
         nodeList.value.forEach((node) => {
-            const testNode = nodeListTest[generateIndex([node.row, node.col], cols.value)]
-            testNode.isRoadNode = false
+            nodeListTest[generateIndex([node.row, node.col], cols.value)].isRoadNode = false
             node.isRoadNode = false;
-            testNode.isVisited = false;
+            nodeListTest[generateIndex([node.row, node.col], cols.value)].isVisited = false
             node.isVisited = false;
-            testNode.distance = Number.POSITIVE_INFINITY;
+            nodeListTest[generateIndex([node.row, node.col], cols.value)].distance = Number.POSITIVE_INFINITY
             node.distance = Number.POSITIVE_INFINITY;
             if(clearWalls) {
-                testNode.isWallNode = false
+                nodeListTest[generateIndex([node.row, node.col], cols.value)].isWallNode = false
                 node.isWallNode = false
-                testNode.weight = 1
+                nodeListTest[generateIndex([node.row, node.col], cols.value)].weight = 1
                 node.weight = 1
             }
         })
