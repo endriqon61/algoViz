@@ -92,14 +92,18 @@
                     newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                 }
             } else if(currentDraggingNode.value == "end"){
-                
+                if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
+                nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                 if(newEndNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
                     clearGraph(false)
-                    const nodesToAnimate = aStarSync(startNode, rows.value, cols.value, nodeListTest, newEndNode)
-                    nodesToAnimate?.forEach(node => {
-                        nodeList.value[generateIndex([node.row, node.col], cols.value)].isVisited = true
-                    })
+
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                    nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
+                    const nodesToAnimate = aStarSync(startNode, rows.value, cols.value, nodeListTest, newEndNode)
+                    console.log('nodes to animate', nodesToAnimate)
+                    for(let node of nodesToAnimate!){
+                        nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                    }
                 }
             }
     }
@@ -118,13 +122,18 @@
     }
     function makeWallNode(r: number, c: number): void {
         const node = nodeList.value[cols.value*(r - 1) + c - 1]
-        if(node.isEndNode || node.isStartNode || node.weight > 1) return
+        const nodeTest = nodeListTest[cols.value*(r - 1) + c - 1]
+        if(node.isEndNode || node.isStartNode || node.weight > 1 || nodeTest.isEndNode || nodeTest.isStartNode || nodeTest.weight > 1) return
 
         if(wallMode.value) {
+            nodeTest.isWallNode = !nodeTest.isWallNode
             node.isWallNode = !node.isWallNode
         }else if(weightMode.value) {
             if(!node.isWallNode) {
                 node.weight+=2
+            }
+            if(!nodeTest.isWallNode) {
+                nodeTest.weight+=2
             }
         }
     }
@@ -168,7 +177,7 @@
         })
     }
     async function visualizeAlgorithm(e: any) {
-        console.log("eeeee", e)
+        toggleAnimation.value = true
         clearGraph(false)
         startNode.value = newStartNode.value
         if(e == "aStar") {

@@ -49,7 +49,7 @@ export function aStarSync(s: Ref<number[]>, rows: number, cols: number, graph: I
 
         if(!currentNode) return
         currentNode.isVisited = true 
-        nodesToAnimate.push(currentNode)
+        nodesToAnimate.push([currentNode.row, currentNode.col])
 
         const adjacentNodes: Array<number[]> = getAdjacentNodes([currentNode.row, currentNode.col], rows, cols, graph) 
 
