@@ -107,6 +107,7 @@ const instance = getCurrentInstance();
                         // nodeList.value[generateIndex(node, cols.value)].isVisited = true
                         let testNode = document.getElementById(node.join())
                         testNode?.classList.add('vis') 
+                        if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
                     }            
                     nodesToChangeOld = nodesToChange!.slice()
                                
@@ -173,6 +174,7 @@ const instance = getCurrentInstance();
                         // nodeList.value[generateIndex(node, cols.value)].isVisited = true
                         let testNode = document.getElementById(node.join())
                         testNode?.classList.remove('vis') 
+                        testNode?.classList.remove('road-no-animation') 
         }
         nodeList.value.forEach((node) => {
             nodeListTest[generateIndex([node.row, node.col], cols.value)].isRoadNode = false
@@ -234,6 +236,9 @@ const instance = getCurrentInstance();
     }
     .vis {
         background-color: red;
+    }
+    .road-no-animation {
+        background-color: gray;
     }
 
    .menu {

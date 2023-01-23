@@ -1,4 +1,4 @@
-import { buildRoad, getAdjacentNodes, generateIndex, findShortestDistanceNode } from '@/utils/graphUtils'
+import { buildRoad, buildRoadSync, getAdjacentNodes, generateIndex, findShortestDistanceNode } from '@/utils/graphUtils'
 import sleep from '@/utils/sleep'
 
 import type { Ref } from 'vue'
@@ -69,8 +69,7 @@ export function aStarSync(s: Ref<number[]>, rows: number, cols: number, graph: I
                     predecessorList.push({node: [node.row, node.col].join(), predecessor: [node.parent.row, node.parent.col].join()})
                     node = node.parent
                 }
-                // await buildRoad(graph, cols, sleep, e.value, predecessorList, s.value)
-                console.log("nodes to animate", nodesToAnimate)
+                buildRoadSync(graph, cols, sleep, e.value, predecessorList, s.value)
                 return nodesToAnimate
             }
 
