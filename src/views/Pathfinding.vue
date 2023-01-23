@@ -3,7 +3,7 @@
         <AlgorithmPickerMenu class="menu" @clearGraph="() => {clearGraph(true)}" @visualize="(e) => visualizeAlgorithm(e)" menu-type="pathfinding" :options="options"/>
         <div class="grid-container">
                 <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
-                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => dragHandler(n, f)" v-for="node in nodeList" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :toggleAnimation="toggleAnimation" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :toggleAnimation="toggleAnimation" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
                 </div>
         </div>
     </div>
@@ -16,14 +16,14 @@
     import aStar, { aStarSync } from "@/algorithms/search/aStar"
     import type { INode } from "../interfaces/Graph"
     import type { Ref } from "vue"
-    import { ref, onMounted, onUnmounted } from "vue"
+    import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch } from "vue"
     import sleep from "@/utils/sleep"
     import { generateIndex } from "@/utils/graphUtils"
     
 
     const newStartNode: Ref<number[]> = ref([6,8])
     const wallMode = ref(false)
-    const nodeList: Ref<Array<INode>> = ref([]);
+    let nodeList: Ref<Array<INode>> = ref([]);
     const startNode:  Ref<Array<number>> = ref([6,8])
     const endNode: Ref<Array<number>> = ref([10, 16])
     const oldStartNode: Ref<Array<number>> = ref([6, 8])
@@ -31,9 +31,9 @@
     const weightMode = ref(false)
     const nodeListTest: INode[] = []
     const toggleAnimation: Ref<boolean> = ref(false)
-
+const instance = getCurrentInstance();
     const ac = new AbortController()
-
+    const change = ref(false)
     const options =  ["Bfs", "dijkstras", "aStar"]
 
 
@@ -52,7 +52,7 @@
     const rows = ref(20);
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
-
+    let nodesToChangeOld: any[] = []
 
     function dragEndHandler() {
 
@@ -83,7 +83,7 @@
 
     }
 
-    function dragHandler(e: any, f: any){
+    async function dragHandler(e: any, f: any){
             toggleAnimation.value = false
             if(currentDraggingNode.value == "start") {
                 if(newStartNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
@@ -99,14 +99,22 @@
 
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
-                    const nodesToAnimate = aStarSync(startNode, rows.value, cols.value, nodeListTest, newEndNode)
-                    console.log('nodes to animate', nodesToAnimate)
-                    for(let node of nodesToAnimate!){
-                        nodeList.value[generateIndex(node, cols.value)].isVisited = true
-                    }
+                    console.time("timing")
+                    const nodesToChange  = aStarSync(startNode, rows.value, cols.value, nodeListTest, newEndNode)
+                    console.timeEnd("timing")
+                          
+                    for(let node of nodesToChange!){
+                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                        let testNode = document.getElementById(node.join())
+                        testNode?.classList.add('vis') 
+                    }            
+                    nodesToChangeOld = nodesToChange!.slice()
+                               
                 }
             }
     }
+
+         
 
     function dragStart(ds: DOMStringMap) {
         if(ds.isendnode == "true") {
@@ -161,6 +169,11 @@
     createNodeList()
 
     function clearGraph(clearWalls: boolean) {
+        for(let node of nodesToChangeOld!){
+                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                        let testNode = document.getElementById(node.join())
+                        testNode?.classList.remove('vis') 
+        }
         nodeList.value.forEach((node) => {
             nodeListTest[generateIndex([node.row, node.col], cols.value)].isRoadNode = false
             node.isRoadNode = false;
@@ -218,6 +231,9 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    .vis {
+        background-color: red;
     }
 
    .menu {
