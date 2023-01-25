@@ -68,14 +68,14 @@ export function aStarSync(s: number[], rows: number, cols: number, graph: INode[
                 let node = neighbor;
 
 
-                // while([node.row, node.col].join() != s.join()) {
-                //     if(!node.parent) break;
-                //     predecessorList.push({node: [node.row, node.col].join(), predecessor: [node.parent!.row, node.parent!.col].join()})
-                //     node = node.parent
+                while([node.row, node.col].join() != s.join()) {
+                    if(!node.parent) break;
+                    predecessorList.push({node: [node.row, node.col].join(), predecessor: [node.parent!.row, node.parent!.col].join()})
+                    node = node.parent
 
-                // }
+                }
+                buildRoadSync(graph, cols, sleep, e, predecessorList, s)
                 return nodesToAnimate
-                // buildRoadSync(graph, cols, sleep, e.value, predecessorList, s.value)
             }
 
             if(!queue.includes(neighbor)) 

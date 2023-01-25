@@ -19,7 +19,6 @@
     import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch } from "vue"
     import sleep from "@/utils/sleep"
     import { generateIndex } from "@/utils/graphUtils"
-    import LogRocket from 'logrocket';
     
 
     const newStartNode: Ref<number[]> = ref([6,8])
@@ -41,7 +40,6 @@
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
    
-    LogRocket.init('p3oubp/algoviz');
 
     function toggleWallNode(e: any) {
         if(e.key == "w") {
@@ -111,7 +109,7 @@
                         if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
                     }            
                     nodesToChangeOld = nodesToChange!.slice()
-                    instance?.proxy?.$forceUpdate() 
+                    // instance?.proxy?.$forceUpdate() 
                 }
             } else if(currentDraggingNode.value == "end"){
                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
@@ -121,14 +119,18 @@
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
+                    console.time("function time")
                     const nodesToChange  = aStarSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
+                    console.timeEnd("function time")
                           
+                    console.time("loop time")
                     for(let node of nodesToChange!){
                         // nodeList.value[generateIndex(node, cols.value)].isVisited = true
                         let testNode = document.getElementById(node.join())
                         testNode?.classList.add('vis') 
                         if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
                     }            
+                    console.timeEnd("loop time")
                     nodesToChangeOld = nodesToChange!.slice()
                                
                 }

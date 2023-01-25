@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import LogRocket from 'logrocket';
-LogRocket.init('p3oubp/algoviz');
 </script>
 
 <template>
