@@ -3,7 +3,8 @@ import sleep from '@/utils/sleep'
 
 import type { Ref } from 'vue'
 import type { INode } from '@/interfaces/Graph'
-import { reactive } from 'vue'
+import { reactive, unref } from 'vue'
+
 
 function setHeuristics(graph: INode[], e: number[]): void {
     for(let nodeIndex in graph) {
@@ -32,25 +33,26 @@ function findAndRemoveShortestDistanceNode(queue: INode[]) {
     return currentShortest;
 }
 
-export function aStarSync(s: Ref<number[]>, rows: number, cols: number, graph: INode[], e: Ref<number[]>) {
+export function aStarSync(s: number[], rows: number, cols: number, graph: INode[], e: number[]) {
 
-    setHeuristics(graph, e.value)
-
-
+    setHeuristics(graph, e)
+    console.log('s', s, "e", e)
     const nodesToAnimate: any[] = []
-    const startNode = graph[generateIndex(s.value, cols)]
+    const startNode = graph[generateIndex(s, cols)]
     const predecessorList: Array<{node: string, predecessor: string}> = []
     startNode.distance = 0;
     let queue: INode[] = [startNode]
     let currentNode: any = startNode
-    while(queue.length >= 1) {
+    let i = 1;
+    console.log("AAAAAAAAAAAAAAAa")
+    console.log("graph", graph)
+    while(queue.length > 0){
 
         currentNode = findAndRemoveShortestDistanceNode(queue)
-
-        if(!currentNode) return
+        console.log('looping', nodesToAnimate) 
         currentNode.isVisited = true 
+        if(!currentNode) return
         nodesToAnimate.push([currentNode.row, currentNode.col])
-
         const adjacentNodes: Array<number[]> = getAdjacentNodes([currentNode.row, currentNode.col], rows, cols, graph) 
 
         
@@ -61,16 +63,19 @@ export function aStarSync(s: Ref<number[]>, rows: number, cols: number, graph: I
             const nodeInQueueWithSamePosition = queue.find(node => [node.row, node.col].join() === [neighbor.row, neighbor.col].join())
 
             if(neighbor.isEndNode) {
+                console.log('end found')
                 neighbor.parent = currentNode
                 let node = neighbor;
 
 
-                while(node.parent) {
-                    predecessorList.push({node: [node.row, node.col].join(), predecessor: [node.parent.row, node.parent.col].join()})
-                    node = node.parent
-                }
-                buildRoadSync(graph, cols, sleep, e.value, predecessorList, s.value)
+                // while([node.row, node.col].join() != s.join()) {
+                //     if(!node.parent) break;
+                //     predecessorList.push({node: [node.row, node.col].join(), predecessor: [node.parent!.row, node.parent!.col].join()})
+                //     node = node.parent
+
+                // }
                 return nodesToAnimate
+                // buildRoadSync(graph, cols, sleep, e.value, predecessorList, s.value)
             }
 
             if(!queue.includes(neighbor)) 

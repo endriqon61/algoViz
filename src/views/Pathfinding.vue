@@ -19,6 +19,7 @@
     import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch } from "vue"
     import sleep from "@/utils/sleep"
     import { generateIndex } from "@/utils/graphUtils"
+    import LogRocket from 'logrocket';
     
 
     const newStartNode: Ref<number[]> = ref([6,8])
@@ -31,12 +32,16 @@
     const weightMode = ref(false)
     const nodeListTest: INode[] = []
     const toggleAnimation: Ref<boolean> = ref(false)
-const instance = getCurrentInstance();
+    const instance = getCurrentInstance();
     const ac = new AbortController()
     const change = ref(false)
     const options =  ["Bfs", "dijkstras", "aStar"]
-
-
+    const newEndNode = ref([10, 16])
+    const rows = ref(20);
+    const cols = ref(50);
+    const currentDraggingNode: Ref<string> = ref("")
+   
+    LogRocket.init('p3oubp/algoviz');
 
     function toggleWallNode(e: any) {
         if(e.key == "w") {
@@ -48,10 +53,7 @@ const instance = getCurrentInstance();
         }
     }
 
-    const newEndNode = ref([10, 16])
-    const rows = ref(20);
-    const cols = ref(50);
-    const currentDraggingNode: Ref<string> = ref("")
+ 
     let nodesToChangeOld: any[] = []
 
     function dragEndHandler() {
@@ -86,10 +88,30 @@ const instance = getCurrentInstance();
     async function dragHandler(e: any, f: any){
             toggleAnimation.value = false
             if(currentDraggingNode.value == "start") {
+
+                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
+                nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = false
                 if(newStartNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
                     clearGraph(false)
-                    const nodesToAnimate = aStarSync(newStartNode, rows.value, cols.value, nodeListTest, endNode)
+
+                    console.log("old start", newStartNode.value)
+
                     newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                    nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = true
+                    console.log("new start", newStartNode.value)
+                    const testStart = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                    const testEnd = Array.from(endNode.value)
+                    const nodesToChange  = aStarSync(testStart, rows.value, cols.value, nodeListTest, testEnd)
+
+                    console.log(nodesToChange, "nodesTochange") 
+                    for(let node of nodesToChange!){
+                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                        let testNode = document.getElementById(node.join())
+                        testNode?.classList.add('vis') 
+                        if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
+                    }            
+                    nodesToChangeOld = nodesToChange!.slice()
+                    instance?.proxy?.$forceUpdate() 
                 }
             } else if(currentDraggingNode.value == "end"){
                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
@@ -99,9 +121,7 @@ const instance = getCurrentInstance();
 
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
-                    console.time("timing")
-                    const nodesToChange  = aStarSync(startNode, rows.value, cols.value, nodeListTest, newEndNode)
-                    console.timeEnd("timing")
+                    const nodesToChange  = aStarSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
                           
                     for(let node of nodesToChange!){
                         // nodeList.value[generateIndex(node, cols.value)].isVisited = true
@@ -122,9 +142,8 @@ const instance = getCurrentInstance();
             currentDraggingNode.value = "end"
             oldEndNode.value = [parseInt(ds.row!), parseInt(ds.col!)]
         } else if(ds.isstartnode == "true") {
-            currentDraggingNode.value = ds.isendnode == "true" ? "end" : ds.isstartnode == "true" ? "start" : ""
-            oldStartNode.value[0] = parseInt(ds.row!)         
-            oldStartNode.value[1] = parseInt(ds.col!)         
+            currentDraggingNode.value = "start"
+            oldStartNode.value = [parseInt(ds.row!), parseInt(ds.col!)]
 
         }
 
@@ -194,7 +213,7 @@ const instance = getCurrentInstance();
     async function visualizeAlgorithm(e: any) {
         toggleAnimation.value = true
         clearGraph(false)
-        startNode.value = newStartNode.value
+        // startNode.value = newStartNode.value
         if(e == "aStar") {
             aStar(startNode, rows.value, cols.value, nodeList, endNode)
         } else if (e == "dijkstras") {
