@@ -90,11 +90,11 @@
             if(currentDraggingNode.value == "start") {
 
                  if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
-                nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = false
                 if(newStartNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
                     clearGraph(false)
 
                     console.log("old start", newStartNode.value)
+                    nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = false
 
                     newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = true
@@ -115,10 +115,10 @@
                 }
             } else if(currentDraggingNode.value == "end"){
                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
-                nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                 if(newEndNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
                     clearGraph(false)
 
+                    nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
                     const nodesToChange  = aStarSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
