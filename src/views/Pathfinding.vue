@@ -11,15 +11,15 @@
 <script setup lang="ts">
     import Node from "../components/Graph/Node.vue"
     import bfs from "@/algorithms/search/breadthFirst"
-    import dijkstras from "@/algorithms/search/dijkstras"
-    import AlgorithmPickerMenu from "../components/Navigation/AlgorithmPickerMenu.vue"
+    import dijkstras, {dijkstrasSync} from "@/algorithms/search/dijkstras"
+    import AlgorithmPickerMenu from "../components/Navigation/algorithmPickerMenu.vue"
     import aStar, { aStarSync } from "@/algorithms/search/aStar"
     import type { INode } from "../interfaces/Graph"
     import type { Ref } from "vue"
     import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch } from "vue"
     import sleep from "@/utils/sleep"
     import { generateIndex } from "@/utils/graphUtils"
-    import LogRocket from 'logrocket';
+   
     
 
     const newStartNode: Ref<number[]> = ref([6,8])
@@ -41,7 +41,9 @@
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
    
-    LogRocket.init('p3oubp/algoviz');
+    watch(weightMode, (old) => {
+        console.log('weight mode', old)
+    })
 
     function toggleWallNode(e: any) {
         if(e.key == "w") {
@@ -53,7 +55,7 @@
         }
     }
 
- 
+  
     let nodesToChangeOld: any[] = []
 
     function dragEndHandler() {
@@ -101,7 +103,7 @@
                     console.log("new start", newStartNode.value)
                     const testStart = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     const testEnd = Array.from(endNode.value)
-                    const nodesToChange  = aStarSync(testStart, rows.value, cols.value, nodeListTest, testEnd)
+                    const nodesToChange  = dijkstrasSync(testStart, rows.value, cols.value, nodeListTest, testEnd)
 
                     console.log(nodesToChange, "nodesTochange") 
                     for(let node of nodesToChange!){
@@ -111,7 +113,6 @@
                         if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
                     }            
                     nodesToChangeOld = nodesToChange!.slice()
-                    instance?.proxy?.$forceUpdate() 
                 }
             } else if(currentDraggingNode.value == "end"){
                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
@@ -121,7 +122,9 @@
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
-                    const nodesToChange  = aStarSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
+                    console.time("function time")
+                    const nodesToChange  = dijkstrasSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
+                    console.timeEnd("function time")
                           
                     for(let node of nodesToChange!){
                         // nodeList.value[generateIndex(node, cols.value)].isVisited = true
@@ -149,14 +152,18 @@
 
     }
     function makeWallNode(r: number, c: number): void {
+        
+        console.log('hovering', weightMode.value, wallMode.value)
+        const testBool = unref(weightMode.value)
         const node = nodeList.value[cols.value*(r - 1) + c - 1]
         const nodeTest = nodeListTest[cols.value*(r - 1) + c - 1]
-        if(node.isEndNode || node.isStartNode || node.weight > 1 || nodeTest.isEndNode || nodeTest.isStartNode || nodeTest.weight > 1) return
 
-        if(wallMode.value) {
+        if(node.isEndNode || node.isStartNode || nodeTest.isEndNode || nodeTest.isStartNode) return
+        if(wallMode.value && node.weight <=1) {
             nodeTest.isWallNode = !nodeTest.isWallNode
             node.isWallNode = !node.isWallNode
-        }else if(weightMode.value) {
+        }if(testBool) {
+            console.log('im in')
             if(!node.isWallNode) {
                 node.weight+=2
             }

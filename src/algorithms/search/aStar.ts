@@ -34,7 +34,7 @@ function findAndRemoveShortestDistanceNode(queue: INode[]) {
 }
 
 export function aStarSync(s: number[], rows: number, cols: number, graph: INode[], e: number[]) {
-
+    
     setHeuristics(graph, e)
     console.log('s', s, "e", e)
     const nodesToAnimate: any[] = []
