@@ -115,25 +115,39 @@
                     nodesToChangeOld = nodesToChange!.slice()
                 }
             } else if(currentDraggingNode.value == "end"){
+                
                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
                 if(newEndNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
-                    clearGraph(false)
-
+                    console.time("complete time")
+                    console.time("clear time")
+                    clearShadowGraph(false)
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
+                    console.timeEnd("clear time")
                     console.time("function time")
                     const nodesToChange  = dijkstrasSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
                     console.timeEnd("function time")
                           
+                    console.time("loop time")
+                    for(let node of nodesToChangeOld!){
+                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                        let testNode = document.getElementById(node.join())
+                        testNode?.classList.add('vis') 
+                        if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
+                    }   
                     for(let node of nodesToChange!){
                         // nodeList.value[generateIndex(node, cols.value)].isVisited = true
                         let testNode = document.getElementById(node.join())
                         testNode?.classList.add('vis') 
                         if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
                     }            
+                    console.timeEnd("loop time")
+                    console.time("slice time")
                     nodesToChangeOld = nodesToChange!.slice()
+                    console.timeEnd("slice time")
                                
+                    console.timeEnd("complete time")
                 }
             }
     }
@@ -194,25 +208,23 @@
 
     }
     createNodeList()
+    function clearShadowGraph(clearWalls: boolean){
 
+        nodesToChangeOld.forEach(node => {
+            nodeListTest[generateIndex(node, cols.value)].isVisited = false
+            nodeListTest[generateIndex(node, cols.value)].isRoadNode = false
+        
+        })
+
+    }
     function clearGraph(clearWalls: boolean) {
-        for(let node of nodesToChangeOld!){
-                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
-                        let testNode = document.getElementById(node.join())
-                        testNode?.classList.remove('vis') 
-                        testNode?.classList.remove('road-no-animation') 
-        }
+
         nodeList.value.forEach((node) => {
-            nodeListTest[generateIndex([node.row, node.col], cols.value)].isRoadNode = false
             node.isRoadNode = false;
-            nodeListTest[generateIndex([node.row, node.col], cols.value)].isVisited = false
             node.isVisited = false;
-            nodeListTest[generateIndex([node.row, node.col], cols.value)].distance = Number.POSITIVE_INFINITY
             node.distance = Number.POSITIVE_INFINITY;
             if(clearWalls) {
-                nodeListTest[generateIndex([node.row, node.col], cols.value)].isWallNode = false
                 node.isWallNode = false
-                nodeListTest[generateIndex([node.row, node.col], cols.value)].weight = 1
                 node.weight = 1
             }
         })
