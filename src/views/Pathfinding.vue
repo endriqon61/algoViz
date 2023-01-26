@@ -11,7 +11,7 @@
 <script setup lang="ts">
     import Node from "../components/Graph/Node.vue"
     import bfs from "@/algorithms/search/breadthFirst"
-    import dijkstras from "@/algorithms/search/dijkstras"
+    import dijkstras, {dijkstrasSync} from "@/algorithms/search/dijkstras"
     import AlgorithmPickerMenu from "../components/Navigation/AlgorithmPickerMenu.vue"
     import aStar, { aStarSync } from "@/algorithms/search/aStar"
     import type { INode } from "../interfaces/Graph"
@@ -51,7 +51,7 @@
         }
     }
 
- 
+  
     let nodesToChangeOld: any[] = []
 
     function dragEndHandler() {
@@ -99,7 +99,7 @@
                     console.log("new start", newStartNode.value)
                     const testStart = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     const testEnd = Array.from(endNode.value)
-                    const nodesToChange  = aStarSync(testStart, rows.value, cols.value, nodeListTest, testEnd)
+                    const nodesToChange  = dijkstrasSync(testStart, rows.value, cols.value, nodeListTest, testEnd)
 
                     console.log(nodesToChange, "nodesTochange") 
                     for(let node of nodesToChange!){
@@ -110,20 +110,30 @@
                     }            
                     nodesToChangeOld = nodesToChange!.slice()
                     // instance?.proxy?.$forceUpdate() 
+
                 }
             } else if(currentDraggingNode.value == "end"){
+                
                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
                 if(newEndNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
-                    clearGraph(false)
-
+                    console.time("complete time")
+                    console.time("clear time")
+                    clearShadowGraph(false)
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
+                    console.timeEnd("clear time")
                     console.time("function time")
-                    const nodesToChange  = aStarSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
+                    const nodesToChange  = dijkstrasSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
                     console.timeEnd("function time")
                           
                     console.time("loop time")
+                    for(let node of nodesToChangeOld!){
+                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                        let testNode = document.getElementById(node.join())
+                        testNode?.classList.add('vis') 
+                        if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
+                    }   
                     for(let node of nodesToChange!){
                         // nodeList.value[generateIndex(node, cols.value)].isVisited = true
                         let testNode = document.getElementById(node.join())
@@ -131,8 +141,11 @@
                         if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
                     }            
                     console.timeEnd("loop time")
+                    console.time("slice time")
                     nodesToChangeOld = nodesToChange!.slice()
+                    console.timeEnd("slice time")
                                
+                    console.timeEnd("complete time")
                 }
             }
     }
@@ -151,14 +164,18 @@
 
     }
     function makeWallNode(r: number, c: number): void {
+        
+        console.log('hovering', weightMode.value, wallMode.value)
+        const testBool = unref(weightMode.value)
         const node = nodeList.value[cols.value*(r - 1) + c - 1]
         const nodeTest = nodeListTest[cols.value*(r - 1) + c - 1]
-        if(node.isEndNode || node.isStartNode || node.weight > 1 || nodeTest.isEndNode || nodeTest.isStartNode || nodeTest.weight > 1) return
 
-        if(wallMode.value) {
+        if(node.isEndNode || node.isStartNode || nodeTest.isEndNode || nodeTest.isStartNode) return
+        if(wallMode.value && node.weight <=1) {
             nodeTest.isWallNode = !nodeTest.isWallNode
             node.isWallNode = !node.isWallNode
-        }else if(weightMode.value) {
+        }if(testBool) {
+            console.log('im in')
             if(!node.isWallNode) {
                 node.weight+=2
             }
@@ -189,25 +206,23 @@
 
     }
     createNodeList()
+    function clearShadowGraph(clearWalls: boolean){
 
+        nodesToChangeOld.forEach(node => {
+            nodeListTest[generateIndex(node, cols.value)].isVisited = false
+            nodeListTest[generateIndex(node, cols.value)].isRoadNode = false
+        
+        })
+
+    }
     function clearGraph(clearWalls: boolean) {
-        for(let node of nodesToChangeOld!){
-                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
-                        let testNode = document.getElementById(node.join())
-                        testNode?.classList.remove('vis') 
-                        testNode?.classList.remove('road-no-animation') 
-        }
+
         nodeList.value.forEach((node) => {
-            nodeListTest[generateIndex([node.row, node.col], cols.value)].isRoadNode = false
             node.isRoadNode = false;
-            nodeListTest[generateIndex([node.row, node.col], cols.value)].isVisited = false
             node.isVisited = false;
-            nodeListTest[generateIndex([node.row, node.col], cols.value)].distance = Number.POSITIVE_INFINITY
             node.distance = Number.POSITIVE_INFINITY;
             if(clearWalls) {
-                nodeListTest[generateIndex([node.row, node.col], cols.value)].isWallNode = false
                 node.isWallNode = false
-                nodeListTest[generateIndex([node.row, node.col], cols.value)].weight = 1
                 node.weight = 1
             }
         })
