@@ -1,16 +1,16 @@
 <template lang="">
     <div class="main-container">
-        <AlgorithmPickerMenu class="menu" @clearGraph="() => {clearGraph(true)}" @visualize="(e) => visualizeAlgorithm(e)" menu-type="pathfinding" :options="options"/>
+        <AlgorithmPickerMenu class="menu" @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" menu-type="pathfinding" :options="options"/>
         <div class="grid-container">
                 <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
-                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :toggleAnimation="toggleAnimation" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
                 </div>
         </div>
     </div>
 </template>
 <script setup lang="ts">
     import Node from "../components/Graph/Node.vue"
-    import bfs from "@/algorithms/search/breadthFirst"
+    import bfs, {bfsSync} from "@/algorithms/search/breadthFirst"
     import dijkstras, {dijkstrasSync} from "@/algorithms/search/dijkstras"
     import AlgorithmPickerMenu from "../components/Navigation/AlgorithmPickerMenu.vue"
     import aStar, { aStarSync } from "@/algorithms/search/aStar"
@@ -30,15 +30,16 @@
     const oldEndNode: Ref<Array<number>> = ref([10, 16])
     const weightMode = ref(false)
     const nodeListTest: INode[] = []
-    const toggleAnimation: Ref<boolean> = ref(false)
     const instance = getCurrentInstance();
     const ac = new AbortController()
     const change = ref(false)
     const options =  ["Bfs", "dijkstras", "aStar"]
+    const currentAlgorithm: Ref<string> = ref("");
     const newEndNode = ref([10, 16])
     const rows = ref(20);
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
+    const algorithmFinished: Ref<boolean> = ref(false)
    
 
     function toggleWallNode(e: any) {
@@ -51,6 +52,7 @@
         }
     }
 
+    
   
     let nodesToChangeOld: any[] = []
 
@@ -84,68 +86,80 @@
     }
 
     async function dragHandler(e: any, f: any){
-            toggleAnimation.value = false
             if(currentDraggingNode.value == "start") {
 
-                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
-                if(newStartNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
-                    clearGraph(false)
+                if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
+                    if(newStartNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
 
-                    console.log("old start", newStartNode.value)
-                    nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = false
+                        clearShadowGraph(false)
+                        nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = false
 
-                    newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
-                    nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = true
-                    console.log("new start", newStartNode.value)
-                    const testStart = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
-                    const testEnd = Array.from(endNode.value)
-                    const nodesToChange  = dijkstrasSync(testStart, rows.value, cols.value, nodeListTest, testEnd)
+                        newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
+                        nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = true
+                        if(algorithmFinished.value) {
+                            let nodesToChange: number[][]  = [] 
 
-                    console.log(nodesToChange, "nodesTochange") 
-                    for(let node of nodesToChange!){
-                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
-                        let testNode = document.getElementById(node.join())
-                        testNode?.classList.add('vis') 
-                        if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
-                    }            
-                    nodesToChangeOld = nodesToChange!.slice()
-                    // instance?.proxy?.$forceUpdate() 
+                            if(currentAlgorithm.value  == "aStar") {
+                                nodesToChange = aStarSync(newStartNode.value, rows.value, cols.value, nodeListTest, endNode.value).slice()
+                                } else if (currentAlgorithm.value == "dijkstras") {
+                                    nodesToChange = dijkstrasSync(newStartNode.value, rows.value, cols.value, nodeListTest, endNode.value).slice()
+                                } else if(currentAlgorithm.value == "bfs") {
+                                    nodesToChange = bfsSync(newStartNode.value, rows.value, cols.value, nodeListTest, endNode.value).slice()
+                            }
+                        
+                            for(let node of nodesToChangeOld!){
+                                let testNode = document.getElementById(node.join())
+                                testNode?.classList.remove('vis') 
+                                testNode?.classList.remove('road-no-animation')
+                            }   
+                            
+                            for(let node of nodesToChange!){
+                                let testNode = document.getElementById(node.join())
+                                testNode?.classList.add('vis') 
+                                if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
+                            }            
 
-                }
+                            nodesToChangeOld = nodesToChange!.slice()
+
+
+                        }
+                    }
             } else if(currentDraggingNode.value == "end"){
                 
                 if(nodeList.value[generateIndex([parseInt(e.dataset.row), parseInt(e.dataset.col)],cols.value)].isWallNode) return
                 if(newEndNode.value.join() != [parseInt(e.dataset.row), parseInt(e.dataset.col)].join()) {
-                    console.time("complete time")
-                    console.time("clear time")
                     clearShadowGraph(false)
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = false
                     newEndNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
-                    console.timeEnd("clear time")
-                    console.time("function time")
-                    const nodesToChange  = dijkstrasSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value)
-                    console.timeEnd("function time")
-                          
-                    console.time("loop time")
-                    for(let node of nodesToChangeOld!){
-                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
-                        let testNode = document.getElementById(node.join())
-                        testNode?.classList.add('vis') 
-                        if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
-                    }   
-                    for(let node of nodesToChange!){
-                        // nodeList.value[generateIndex(node, cols.value)].isVisited = true
-                        let testNode = document.getElementById(node.join())
-                        testNode?.classList.add('vis') 
-                        if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
-                    }            
-                    console.timeEnd("loop time")
-                    console.time("slice time")
-                    nodesToChangeOld = nodesToChange!.slice()
-                    console.timeEnd("slice time")
+
+
+                    if(algorithmFinished.value) {
+                        let nodesToChange: number[][]  = [] 
+
+                        if(currentAlgorithm.value  == "aStar") {
+                            nodesToChange = aStarSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value).slice()
+                            } else if (currentAlgorithm.value == "dijkstras") {
+                                nodesToChange = dijkstrasSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value).slice()
+                            } else if(currentAlgorithm.value == "bfs") {
+                                nodesToChange = bfsSync(startNode.value, rows.value, cols.value, nodeListTest, newEndNode.value).slice()
+                        }
+                            
+                        for(let node of nodesToChangeOld!){
+                            // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                            let testNode = document.getElementById(node.join())
+                            testNode?.classList.remove('vis') 
+                            testNode?.classList.remove('road-no-animation')
+                        }   
+                        for(let node of nodesToChange!){
+                            // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                            let testNode = document.getElementById(node.join())
+                            testNode?.classList.add('vis') 
+                            if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
+                        }            
+                        nodesToChangeOld = nodesToChange!.slice()
+                    }
                                
-                    console.timeEnd("complete time")
                 }
             }
     }
@@ -153,6 +167,8 @@
          
 
     function dragStart(ds: DOMStringMap) {
+        if(algorithmFinished.value)
+            clearGraph(false)
         if(ds.isendnode == "true") {
             currentDraggingNode.value = "end"
             oldEndNode.value = [parseInt(ds.row!), parseInt(ds.col!)]
@@ -208,10 +224,15 @@
     createNodeList()
     function clearShadowGraph(clearWalls: boolean){
 
-        nodesToChangeOld.forEach(node => {
-            nodeListTest[generateIndex(node, cols.value)].isVisited = false
-            nodeListTest[generateIndex(node, cols.value)].isRoadNode = false
-        
+        nodeListTest.forEach(node => {
+            const nodeInList = nodeListTest[generateIndex([node.row, node.col], cols.value)]
+            nodeInList.isVisited = false
+            nodeInList.isRoadNode = false
+            nodeInList.distance = Number.POSITIVE_INFINITY;
+            if(clearWalls) {
+                nodeInList.isWallNode = false
+                nodeInList.weight = 1
+            }
         })
 
     }
@@ -227,17 +248,41 @@
             }
         })
     }
+
+    function clearGraphs(walls: boolean) {
+        if(walls) {
+            clearGraph(true)
+            clearShadowGraph(true)
+        } else {
+            clearGraph(false)
+            clearShadowGraph(false)
+        }
+    }
     async function visualizeAlgorithm(e: any) {
-        toggleAnimation.value = true
+        algorithmFinished.value = false;
+        for(let node of nodesToChangeOld!){
+                    // nodeList.value[generateIndex(node, cols.value)].isVisited = true
+                    let testNode = document.getElementById(node.join())
+                    testNode?.classList.remove('vis') 
+                    testNode?.classList.remove('road-no-animation')
+        }   
         clearGraph(false)
         // startNode.value = newStartNode.value
         if(e == "aStar") {
-            aStar(startNode, rows.value, cols.value, nodeList, endNode)
+            currentAlgorithm.value = ""
+            await aStar(startNode, rows.value, cols.value, nodeList, endNode)
+            currentAlgorithm.value = "aStar"
+
         } else if (e == "dijkstras") {
-            dijkstras(startNode, rows.value, cols.value, nodeList, endNode)
+            currentAlgorithm.value = ""
+            await dijkstras(startNode, rows.value, cols.value, nodeList, endNode)
+            currentAlgorithm.value = "dijkstras"
         } else if(e == "Bfs") {
-            bfs(startNode, rows, cols, nodeList, endNode)
+            currentAlgorithm.value = ""
+            await bfs(startNode, rows, cols, nodeList, endNode)
+            currentAlgorithm.value = "bfs"
         }
+        algorithmFinished.value = true;
 
     }
     onMounted(() => {
@@ -271,10 +316,10 @@
         align-items: center;
     }
     .vis {
-        background-color: red;
+        background-color: rgb(209, 25, 255);
     }
     .road-no-animation {
-        background-color: gray;
+        background-color: rgb(207, 207, 207);
     }
 
    .menu {

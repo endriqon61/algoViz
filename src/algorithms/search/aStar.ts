@@ -33,7 +33,7 @@ function findAndRemoveShortestDistanceNode(queue: INode[]) {
     return currentShortest;
 }
 
-export function aStarSync(s: number[], rows: number, cols: number, graph: INode[], e: number[]) {
+export function aStarSync(s: number[], rows: number, cols: number, graph: INode[], e: number[]): number[][] {
     
     setHeuristics(graph, e)
     console.log('s', s, "e", e)
@@ -44,14 +44,12 @@ export function aStarSync(s: number[], rows: number, cols: number, graph: INode[
     let queue: INode[] = [startNode]
     let currentNode: any = startNode
     let i = 1;
-    console.log("AAAAAAAAAAAAAAAa")
-    console.log("graph", graph)
+    console.time("loop time astar")
     while(queue.length > 0){
 
         currentNode = findAndRemoveShortestDistanceNode(queue)
-        console.log('looping', nodesToAnimate) 
         currentNode.isVisited = true 
-        if(!currentNode) return
+        if(!currentNode) return nodesToAnimate
         nodesToAnimate.push([currentNode.row, currentNode.col])
         const adjacentNodes: Array<number[]> = getAdjacentNodes([currentNode.row, currentNode.col], rows, cols, graph) 
 
@@ -97,6 +95,7 @@ export function aStarSync(s: number[], rows: number, cols: number, graph: INode[
             
         }
     }
+    console.timeEnd("loop time astar")
 
     return nodesToAnimate
 }
