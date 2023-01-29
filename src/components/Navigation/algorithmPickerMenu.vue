@@ -9,7 +9,7 @@
         </div>
         
         <div class="buttons">
-            <button @click="clearGraph">
+            <button v-if="type == 'sorting'" @click="clearGraph">
                 Clear Walls And Weights
             </button>
             <button @click="visualize">
@@ -44,7 +44,7 @@
 
     
 
-    const { options, type} = defineProps<{options: string[], type: menuType}>()
+    const { options, type } = defineProps<{options: string[], type: menuType}>()
 
     onMounted(() => {
         console.log("options", options)
@@ -76,5 +76,6 @@
         justify-content: space-between;
         position: fixed;
         top: 0;
+        z-index: 900000;
     }
 </style>
