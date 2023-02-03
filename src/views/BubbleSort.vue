@@ -2,27 +2,39 @@
     <AlgorithmPickerMenu @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
     <div class="array-container">
-        <div v-for="(el, index) in elements" class="element" :class="{current: index == currentTwo[0] || index == currentTwo[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
+        <div v-for="(el, index) in elements" class="element" :class="{currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
         <button @click="visualiseBubbleSort">Start</button>
     </div>
 </template>
 <script setup lang="ts">
-    import { bubbleSort, selectionSort} from "@/algorithms/sortingAlgorithms";
+    import { quickSort, bubbleSort, selectionSort} from "@/algorithms/sortingAlgorithms";
     import AlgorithmPickerMenu from "@/components/Navigation/AlgorithmPickerMenu.vue";
-    import { ref, onMounted } from "vue"
+    import { ref, watch, onMounted } from "vue"
     import type { Ref } from "vue"
-    const elements: Ref<number[]> = ref([])
-    const currentTwo = ref([-1, -1])
-    const options = ref(["bubbleSort", "selectionSort"])
+    const elements: Ref<number[]> = ref([14, 13, 12, 15])
+    const currentDouble = ref([-1, -1])
+    const options = ref(["bubbleSort", "selectionSort", "quickSort"])
     const currentOne = ref(-1)
-    const size = ref(30)
+    const currentBetween: Ref<number[]> = ref([-1, -1])
+    const size = ref(120)
+
+    watch(currentBetween, o => {
+        console.log("currentBetween", currentBetween)
+    })
 
     const visualizeAlgorithm = (e: string) => {
-         console.log("e", e)
-         if(e == "bubbleSort") 
-            bubbleSort(elements, currentTwo)
-         else if(e == "selectionSort")  
-            selectionSort(elements, currentOne, currentTwo)
+        console.log("e", e)
+        if(e == "bubbleSort") 
+            bubbleSort(elements.value, currentDouble.value)
+        else if(e == "selectionSort")  
+            selectionSort(elements.value, currentOne.value, currentDouble.value)
+        else if (e == "quickSort") {
+            quickSort(elements.value, 0, elements.value.length - 1, currentBetween.value, currentDouble.value, currentOne.value)
+        }
+
+        currentOne.value = -1
+        currentDouble.value = [-1, -1]
+        currentBetween.value = [-1, -1]
     }
 
     onMounted(() => {
@@ -50,5 +62,8 @@
 
     .currentOne {
         background-color: green;
+    }
+    .currentBetween {
+        background-color: lightyellow;
     }
 </style>
