@@ -3,36 +3,35 @@
     import { swap } from '@/utils/sortingUtils';
     import { Howler, Howl } from 'howler'
 
-    Howler.volume(0.1);
-    export async function bubbleSort(elements: number[], currentDouble: number[]): Promise<void> {
-        const successSound = new Howl({
+    export async function bubbleSort(elements: Ref<number[]>, currentDouble: Ref<number[]>): Promise<void> {
+        const swapSound = new Howl({
             src: ['../../public/short_retro.mp3']
         })
-        const copy = [...elements]
+        const copy = [...elements.value]
         copy.sort((a, b) => a - b)
-        for(let i = 0; i < elements.length - 1; i++) {
-            if(copy.join() === elements.join()) {
-                currentDouble = []
+        for(let i = 0; i < elements.value.length - 1; i++) {
+            if(copy.join() === elements.value.join()) {
+                currentDouble.value = []
                 return
             }
 
-            for(let j = 0; j < elements.length - i - 1; j++) {
+            for(let j = 0; j < elements.value.length - i - 1; j++) {
                 await sleep(5) 
-                currentDouble[0] = j
-                currentDouble[1] = j + 1
-                if(elements[j] > elements[j + 1]){
-                    swap(elements, j+1, j)
-                    successSound.play();
+                currentDouble.value[0] = j
+                currentDouble.value[1] = j + 1
+                if(elements.value[j] > elements.value[j + 1]){
+                    swap(elements.value, j+1, j)
+                    swapSound.play();
                 }
             }
         }
-        currentDouble = [-1, -1]
+        currentDouble.value = [-1, -1]
     }
 
-    export async function selectionSort(elements: number[], currentOne: number, currentDouble: number[]): Promise<void> {
-        const copy = [...elements]
+    export async function selectionSort(elements: Ref<number[]>, currentOne: Ref<number>, currentDouble: Ref<number[]>): Promise<void> {
+        const copy = [...elements.value]
         copy.sort((a, b) => a - b)
-        const successSound = new Howl({
+        const swapSound = new Howl({
             src: ['short_retro2.mp3']
         })
 
@@ -40,53 +39,75 @@
             src: ['short_retro3.mp3']
         })
 
-        for(let i = 0; i < elements.length - 1; i++) {
+        for(let i = 0; i < elements.value.length - 1; i++) {
 
             let currentMin = i;
-            for(let j = i; j < elements.length; j++) {
+            for(let j = i; j < elements.value.length; j++) {
                 await sleep(30)
                 searchingSound.play()
-                currentOne = j
-                if(elements[j] < elements[currentMin]) {
+                currentOne.value = j
+                if(elements.value[j] < elements.value[currentMin]) {
                     currentMin = j
                 }
             }
-            currentOne = -1
-            currentDouble = [i, currentMin]
+            currentOne.value = -1
+            currentDouble.value = [i, currentMin]
             await sleep(50)
-            successSound.play()
-            swap(elements, i, currentMin)
-            currentDouble = []
+            swapSound.play()
+            swap(elements.value, i, currentMin)
+            currentDouble.value = []
         }
     }
 
-    async function partition(arr: number[], low: number, high: number, currentDouble: number[], currentOne: number): Promise<number>{
-        const pivot = arr[high]
+    async function partition(arr: Ref<number[]>, low: number, high: number, currentDouble: Ref<number[]>, currentOne: Ref<number>): Promise<number>{
+
+        const searchingSound = new Howl({
+            src: ['short_retro.mp3']
+        })
+        const swapSound = new Howl({
+            src: ['short_retro2.mp3']
+        })
+
+        const pivot = arr.value[high]
         let i: number = low - 1
         for(let j = low; j < high; j++) {
-            currentOne = j
-            await sleep(5)
-            if(arr[j] < pivot) {
+            await sleep(1)
+            currentOne.value = j
+            searchingSound.volume(0.05)
+            const s = searchingSound.play()
+            searchingSound.rate(0.5, s)
+            if(arr.value[j] < pivot) {
                 i++
-                currentDouble = [i, j]
-                swap(arr, i, j)
-                console.log("swapping")
+                currentDouble.value = [i, j]
+                currentDouble.value = [-1, -1]
+                swap(arr.value, i, j)
             }
         }
-        currentDouble = [high, i + 1]
-        swap(arr, high, i + 1)
-        console.log("swapping pivot", arr)
+        currentDouble.value = [high, i + 1]
+        swap(arr.value, high, i + 1)
 
         return (i + 1)
     }
 
-    export async function quickSort(elements: number[], low: number, high: number, currentBetween: number[], currentDouble: number[], currentOne: number){
-        currentBetween[0] = low
-        currentBetween[1] = high
+    export async function quickSort(elements: Ref<number[]>, low: number, high: number, currentBetween: Ref<number[]>, currentDouble: Ref<number[]>, currentOne: Ref<number>){
+
+        const healSound = new Howl({
+            src: ['retro_heal.wav']
+        })
+
+        currentBetween.value[0] = low
+        currentBetween.value[1] = high
         if(low < high) {
+            await sleep(50)
             const pi = await partition(elements, low, high, currentDouble, currentOne)
+            healSound.volume(15)
+            const s = healSound.play();
+            healSound.fade(0.5, 0, 400, s)
+            healSound.rate(3, s)
+            
             await quickSort(elements, low, pi - 1, currentBetween, currentDouble, currentOne)
             await quickSort(elements, pi + 1, high, currentBetween, currentDouble, currentOne)
         }
+
     }
         

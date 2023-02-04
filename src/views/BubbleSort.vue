@@ -1,9 +1,11 @@
 <template lang="">
-    <AlgorithmPickerMenu @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
+    <div>
+        <AlgorithmPickerMenu @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
-    <div class="array-container">
-        <div v-for="(el, index) in elements" class="element" :class="{currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
-        <button @click="visualiseBubbleSort">Start</button>
+        <div class="array-container">
+            <div v-for="(el, index) in elements" class="element" :class="{currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
+            <button @click="visualiseBubbleSort">Start</button>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -16,20 +18,33 @@
     const options = ref(["bubbleSort", "selectionSort", "quickSort"])
     const currentOne = ref(-1)
     const currentBetween: Ref<number[]> = ref([-1, -1])
-    const size = ref(120)
+    const size = ref(400)
 
-    watch(currentBetween, o => {
-        console.log("currentBetween", currentBetween)
-    })
+    // watch<currentSearchingTuple>([currentBetween, currentDouble, currentOne],  ([cB, cD, cO]) => {
+    //         console.log("current searching", [cB, cD, cO])
+    //         currentBetween = cB
+    //         currentDouble = cD
+    //         currentOne = cO
 
-    const visualizeAlgorithm = (e: string) => {
+    // })
+
+    // watch(currentDouble, o => {
+    //     currentDouble = o
+    // })
+   
+    // watch(currentOne, o => {
+    //     console.log("hello")
+    //     currentOne = o
+    // })
+
+    const visualizeAlgorithm = async(e: string) => {
         console.log("e", e)
         if(e == "bubbleSort") 
-            bubbleSort(elements.value, currentDouble.value)
+            await bubbleSort(elements, currentDouble)
         else if(e == "selectionSort")  
-            selectionSort(elements.value, currentOne.value, currentDouble.value)
+            await selectionSort(elements, currentOne, currentDouble)
         else if (e == "quickSort") {
-            quickSort(elements.value, 0, elements.value.length - 1, currentBetween.value, currentDouble.value, currentOne.value)
+            await quickSort(elements, 0, elements.value.length - 1, currentBetween, currentDouble, currentOne)
         }
 
         currentOne.value = -1
@@ -56,14 +71,14 @@
         box-shadow: 0 0 5px -1px black;
     }
 
-    .current {
-        background-color: red;
-    }
 
+    .currentBetween {
+        background-color: lightyellow;
+    }
     .currentOne {
         background-color: green;
     }
-    .currentBetween {
-        background-color: lightyellow;
+    .currentDouble {
+        background-color: red;
     }
 </style>
