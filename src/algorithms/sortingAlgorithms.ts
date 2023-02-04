@@ -1,12 +1,12 @@
-    import type { Ref } from 'vue'
-    import sleep from '@/utils/sleep'
-    import { swap } from '@/utils/sortingUtils';
-    import { Howler, Howl } from 'howler'
+import type { Ref } from 'vue'
+import sleep from '@/utils/sleep'
+import { swap } from '@/utils/sortingUtils';
+import { Howler, Howl } from 'howler'
 
-    export async function bubbleSort(elements: Ref<number[]>, currentDouble: Ref<number[]>): Promise<void> {
-        const swapSound = new Howl({
-            src: ['../../public/short_retro.mp3']
-        })
+export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble: Ref<number[]>, currentOne: Ref<number>, currentBetween: Ref<number[]>,  {retroSearch, healSound, retroSwap, retroJump}: any, volume: Ref<number>) {
+
+      async function bubbleSort():  Promise<void> {
+      
         const copy = [...elements.value]
         copy.sort((a, b) => a - b)
         for(let i = 0; i < elements.value.length - 1; i++) {
@@ -21,14 +21,19 @@
                 currentDouble.value[1] = j + 1
                 if(elements.value[j] > elements.value[j + 1]){
                     swap(elements.value, j+1, j)
-                    swapSound.play();
+                    retroSearch.volume(volume.value/50)                    
+                    retroSearch.play()
                 }
             }
+            healSound.volume(volume.value * 10)                    
+            healSound.fade(1, 0, 500)
+            healSound.rate(2)
+            healSound.play()
         }
         currentDouble.value = [-1, -1]
     }
 
-    export async function selectionSort(elements: Ref<number[]>, currentOne: Ref<number>, currentDouble: Ref<number[]>): Promise<void> {
+    async function selectionSort(): Promise<void> {
         const copy = [...elements.value]
         copy.sort((a, b) => a - b)
         const swapSound = new Howl({
@@ -59,55 +64,52 @@
         }
     }
 
-    async function partition(arr: Ref<number[]>, low: number, high: number, currentDouble: Ref<number[]>, currentOne: Ref<number>): Promise<number>{
+    async function partition(low: number, high: number): Promise<number>{
 
-        const searchingSound = new Howl({
-            src: ['short_retro.mp3']
-        })
-        const swapSound = new Howl({
-            src: ['short_retro2.mp3']
-        })
+     
 
-        const pivot = arr.value[high]
+        const pivot = elements.value[high]
         let i: number = low - 1
         for(let j = low; j < high; j++) {
             await sleep(1)
             currentOne.value = j
-            searchingSound.volume(0.05)
-            const s = searchingSound.play()
-            searchingSound.rate(0.5, s)
-            if(arr.value[j] < pivot) {
+            retroSearch.volume(volume.value/50)
+            retroSearch.play()
+            if(elements.value[j] < pivot) {
                 i++
                 currentDouble.value = [i, j]
                 currentDouble.value = [-1, -1]
-                swap(arr.value, i, j)
+                swap(elements.value, i, j)
             }
         }
         currentDouble.value = [high, i + 1]
-        swap(arr.value, high, i + 1)
+        swap(elements.value, high, i + 1)
 
         return (i + 1)
     }
 
-    export async function quickSort(elements: Ref<number[]>, low: number, high: number, currentBetween: Ref<number[]>, currentDouble: Ref<number[]>, currentOne: Ref<number>){
+    async function quickSort(low: number, high: number){
 
-        const healSound = new Howl({
-            src: ['retro_heal.wav']
-        })
+      
 
         currentBetween.value[0] = low
         currentBetween.value[1] = high
         if(low < high) {
             await sleep(50)
-            const pi = await partition(elements, low, high, currentDouble, currentOne)
-            healSound.volume(15)
-            const s = healSound.play();
-            healSound.fade(0.5, 0, 400, s)
-            healSound.rate(3, s)
+            const pi = await partition(low , high)
+
+            healSound.fade(0.5, 0, 400)
+            healSound.rate(3)
+            healSound.play()
             
-            await quickSort(elements, low, pi - 1, currentBetween, currentDouble, currentOne)
-            await quickSort(elements, pi + 1, high, currentBetween, currentDouble, currentOne)
+            await quickSort(low, pi - 1)
+            await quickSort(pi + 1, high)
         }
 
     }
+
+
+
+    return {quickSort, bubbleSort, selectionSort}
+}
         

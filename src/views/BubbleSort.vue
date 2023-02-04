@@ -6,45 +6,42 @@
             <div v-for="(el, index) in elements" class="element" :class="{currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
             <button @click="visualiseBubbleSort">Start</button>
         </div>
+        <label for="volume-slider">Volume: </label>
+        <input type="range" min="0" max="10" v-model="volumeRef" @change="(e) => {e.value = volumeRef}"/>
     </div>
 </template>
 <script setup lang="ts">
-    import { quickSort, bubbleSort, selectionSort} from "@/algorithms/sortingAlgorithms";
+    import sortingAlgorithms from "@/algorithms/sortingAlgorithms";
     import AlgorithmPickerMenu from "@/components/Navigation/AlgorithmPickerMenu.vue";
     import { ref, watch, onMounted } from "vue"
+    import { sounds } from "@/config/sounds"
     import type { Ref } from "vue"
+
     const elements: Ref<number[]> = ref([14, 13, 12, 15])
     const currentDouble = ref([-1, -1])
     const options = ref(["bubbleSort", "selectionSort", "quickSort"])
     const currentOne = ref(-1)
     const currentBetween: Ref<number[]> = ref([-1, -1])
     const size = ref(400)
+    const volumeRef: Ref<number>= ref(7)
+    const sound = sounds(volumeRef)
 
-    // watch<currentSearchingTuple>([currentBetween, currentDouble, currentOne],  ([cB, cD, cO]) => {
-    //         console.log("current searching", [cB, cD, cO])
-    //         currentBetween = cB
-    //         currentDouble = cD
-    //         currentOne = cO
+    const { quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef)
 
-    // })
-
-    // watch(currentDouble, o => {
-    //     currentDouble = o
-    // })
-   
-    // watch(currentOne, o => {
-    //     console.log("hello")
-    //     currentOne = o
-    // })
 
     const visualizeAlgorithm = async(e: string) => {
-        console.log("e", e)
+
+        for(let i = 0; i < size.value; i++) {
+            elements.value[i] = Math.floor(Math.random() * 50)
+        }
+
         if(e == "bubbleSort") 
-            await bubbleSort(elements, currentDouble)
+
+            await bubbleSort()
         else if(e == "selectionSort")  
-            await selectionSort(elements, currentOne, currentDouble)
+            await selectionSort()
         else if (e == "quickSort") {
-            await quickSort(elements, 0, elements.value.length - 1, currentBetween, currentDouble, currentOne)
+            await quickSort(0, elements.value.length - 1)
         }
 
         currentOne.value = -1
