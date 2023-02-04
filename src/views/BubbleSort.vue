@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        <AlgorithmPickerMenu @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
+        <AlgorithmPickerMenu @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
         <div class="array-container">
             <div v-for="(el, index) in elements" class="element" :class="{currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
@@ -18,25 +18,56 @@
     import type { Ref } from "vue"
 
     const elements: Ref<number[]> = ref([14, 13, 12, 15])
+    let elementsNonReactive: number[] = []
     const currentDouble = ref([-1, -1])
     const options = ref(["bubbleSort", "selectionSort", "quickSort"])
     const currentOne = ref(-1)
     const currentBetween: Ref<number[]> = ref([-1, -1])
-    const size = ref(400)
+    const size = ref(100)
     const volumeRef: Ref<number>= ref(7)
     const sound = sounds(volumeRef)
+    const currentAlgorithm: Ref<string> = ref("")
 
     const { quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef)
 
 
-    const visualizeAlgorithm = async(e: string) => {
+    const setCurrentAlgorithm = (e: string) => {
+        currentAlgorithm.value = e
+    }
 
-        for(let i = 0; i < size.value; i++) {
-            elements.value[i] = Math.floor(Math.random() * 50)
+    watch(currentAlgorithm, n => {
+        if(n == "bubbleSort") {
+            size.value = 50
         }
 
-        if(e == "bubbleSort") 
+        else if(n == "selectionSort") {
+            size.value = 35
+        }
 
+        else if(n == "quickSort") {
+            size.value = 400
+        }
+
+        populateElementsArray()
+    })
+
+    const populateElementsArray = () =>  {
+
+        elements.value = []
+        elementsNonReactive = []
+        for(let i = 0; i < size.value; i++) {
+            elements.value.push(Math.floor(Math.random() * 50))
+            elementsNonReactive.push(elements.value[i])
+        }
+
+    }
+
+    const visualizeAlgorithm = async(e: string) => {
+        console.log(elements.value, elementsNonReactive)
+        elements.value = elementsNonReactive.slice()
+        console.log(elements.value, elementsNonReactive)
+
+        if(e == "bubbleSort") 
             await bubbleSort()
         else if(e == "selectionSort")  
             await selectionSort()
@@ -44,15 +75,15 @@
             await quickSort(0, elements.value.length - 1)
         }
 
+        elementsNonReactive = elements.value.slice()
+
         currentOne.value = -1
         currentDouble.value = [-1, -1]
         currentBetween.value = [-1, -1]
     }
 
     onMounted(() => {
-        for(let i = 0; i < size.value; i++) {
-            elements.value.push(Math.floor(Math.random() * 50))
-        }
+        populateElementsArray()
     })
     
 </script>

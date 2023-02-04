@@ -23,7 +23,7 @@
     import { ref,  onMounted, computed } from "vue"
     import type { Ref, ComputedRef} from "vue"
     
-    const emit = defineEmits(['visualize' , 'clearGraph'])
+    const emit = defineEmits(['visualize' , 'clearGraph', 'pickAlgorithm'])
 
     function clearGraph() {
         emit('clearGraph')
@@ -39,6 +39,7 @@
 
     function setSelectedAlgorithm(option: string) {
         selectedAlgorithm.value = option
+        emit('pickAlgorithm', option)
     }
 
 

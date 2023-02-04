@@ -25,7 +25,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
                     retroSearch.play()
                 }
             }
-            healSound.volume(volume.value * 10)                    
+            healSound.volume(volume.value/50)                    
             healSound.fade(1, 0, 500)
             healSound.rate(2)
             healSound.play()
@@ -36,20 +36,15 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
     async function selectionSort(): Promise<void> {
         const copy = [...elements.value]
         copy.sort((a, b) => a - b)
-        const swapSound = new Howl({
-            src: ['short_retro2.mp3']
-        })
-
-        const searchingSound = new Howl({
-            src: ['short_retro3.mp3']
-        })
 
         for(let i = 0; i < elements.value.length - 1; i++) {
 
             let currentMin = i;
             for(let j = i; j < elements.value.length; j++) {
                 await sleep(30)
-                searchingSound.play()
+                retroSearch.volume(volume.value/50)
+                retroSearch.play()
+
                 currentOne.value = j
                 if(elements.value[j] < elements.value[currentMin]) {
                     currentMin = j
@@ -58,7 +53,8 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
             currentOne.value = -1
             currentDouble.value = [i, currentMin]
             await sleep(50)
-            swapSound.play()
+            retroSwap.volume(volume.value*10)
+            retroSwap.play()
             swap(elements.value, i, currentMin)
             currentDouble.value = []
         }
@@ -97,7 +93,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         if(low < high) {
             await sleep(50)
             const pi = await partition(low , high)
-
+            healSound.volume(volume.value/50)
             healSound.fade(0.5, 0, 400)
             healSound.rate(3)
             healSound.play()
@@ -108,8 +104,11 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
 
     }
 
+    async function mergeSort() {
+
+    }
 
 
-    return {quickSort, bubbleSort, selectionSort}
+    return { mergeSort, quickSort, bubbleSort, selectionSort }
 }
         
