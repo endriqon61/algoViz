@@ -25,8 +25,8 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
                     retroSearch.play()
                 }
             }
-            healSound.volume(volume.value/50)                    
-            healSound.fade(1, 0, 500)
+            healSound.volume(volume.value/10)                    
+            healSound.fade(volume.value/10, 0, 500)
             healSound.rate(2)
             healSound.play()
         }
@@ -94,7 +94,8 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
             await sleep(50)
             const pi = await partition(low , high)
             healSound.volume(volume.value/50)
-            healSound.fade(0.5, 0, 400)
+            
+            healSound.fade(volume.value/10, 0, 400, )
             healSound.rate(3)
             healSound.play()
             
