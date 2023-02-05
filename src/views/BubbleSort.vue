@@ -3,7 +3,7 @@
         <AlgorithmPickerMenu @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
         <div class="array-container">
-            <div v-for="(el, index) in elements" class="element" :class="{currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
+            <div v-for="(el, index) in elements" class="element" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] || index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
         </div>
         <label for="volume-slider">Volume: </label>
         <input type="range" min="0" max="10" v-model="volumeRef" @change="(e) => {e.value = volumeRef}"/>
@@ -27,6 +27,7 @@
     const sound = sounds(volumeRef)
     const currentAlgorithm: Ref<string> = ref("")
     const rePopulateArrayBool: Ref<boolean> = ref(false)
+    const currentBetweenSuccess: Ref<number[]> = ref([-1, -1])
 
     const { mergeSort, quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef)
 
@@ -81,10 +82,12 @@
         }
 
         for(let i in elements.value) {
-            currentBetween.value = [0, Number(i)]
+            currentBetweenSuccess.value = [0, Number(i)]
             await sleep(15)
         }
         await sleep(1000)
+        currentBetweenSuccess.value = [-1, -1]
+
         rePopulateArrayBool.value = true
 
         currentOne.value = -1
@@ -105,18 +108,21 @@
     }
 
     .element {
-        background-color: blue;
+        background-color: rgb(200, 0, 255);
         box-shadow: 0 0 5px -1px black;
     }
 
 
     .currentBetween {
-        background-color: lightyellow;
+        background-color: rgb(34, 34, 34);
     }
     .currentOne {
-        background-color: green;
+        background-color: rgb(27, 255, 126);
     }
     .currentDouble {
-        background-color: red;
+        background-color: rgb(242, 83, 78);
+    }
+    .currentBetweenSuccess {
+        background-color: rgb(36, 237, 83);
     }
 </style>
