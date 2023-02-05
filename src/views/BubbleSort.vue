@@ -15,19 +15,20 @@
     import { ref, watch, onMounted } from "vue"
     import { sounds } from "@/config/sounds"
     import type { Ref } from "vue"
+    import sleep from "@/utils/sleep";
 
     const elements: Ref<number[]> = ref([14, 13, 12, 15])
-    let elementsNonReactive: number[] = []
     const currentDouble = ref([-1, -1])
-    const options = ref(["bubbleSort", "selectionSort", "quickSort"])
+    const options = ref(["bubbleSort", "mergeSort", "selectionSort", "quickSort"])
     const currentOne = ref(-1)
     const currentBetween: Ref<number[]> = ref([-1, -1])
     const size = ref(100)
     const volumeRef: Ref<number>= ref(7)
     const sound = sounds(volumeRef)
     const currentAlgorithm: Ref<string> = ref("")
+    const rePopulateArrayBool: Ref<boolean> = ref(false)
 
-    const { quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef)
+    const { mergeSort, quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef)
 
 
     const setCurrentAlgorithm = (e: string) => {
@@ -43,28 +44,31 @@
             size.value = 35
         }
 
-        else if(n == "quickSort") {
+        else if(n == "quickSort" || n == "mergeSort") {
             size.value = 400
         }
+        
 
-        populateElementsArray()
+        populateArray(elements)
+        rePopulateArrayBool.value = false
     })
 
-    const populateElementsArray = () =>  {
+    const populateArray = (arr: Ref<number[]>) =>  {
 
-        elements.value = []
-        elementsNonReactive = []
+        arr.value = []
         for(let i = 0; i < size.value; i++) {
-            elements.value.push(Math.floor(Math.random() * 50))
-            elementsNonReactive.push(elements.value[i])
+            arr.value.push(Math.floor(Math.random() * 50))
         }
 
     }
 
+
     const visualizeAlgorithm = async(e: string) => {
-        console.log(elements.value, elementsNonReactive)
-        elements.value = elementsNonReactive.slice()
-        console.log(elements.value, elementsNonReactive)
+
+        if(rePopulateArrayBool.value) {
+            populateArray(elements)
+        } 
+            
 
         if(e == "bubbleSort") 
             await bubbleSort()
@@ -72,9 +76,16 @@
             await selectionSort()
         else if (e == "quickSort") {
             await quickSort(0, elements.value.length - 1)
+        }else if(e == "mergeSort") {
+            await mergeSort(0, elements.value.length - 1)
         }
 
-        elementsNonReactive = elements.value.slice()
+        for(let i in elements.value) {
+            currentBetween.value = [0, Number(i)]
+            await sleep(15)
+        }
+        await sleep(1000)
+        rePopulateArrayBool.value = true
 
         currentOne.value = -1
         currentDouble.value = [-1, -1]
@@ -82,7 +93,7 @@
     }
 
     onMounted(() => {
-        populateElementsArray()
+        populateArray(elements) 
     })
     
 </script>

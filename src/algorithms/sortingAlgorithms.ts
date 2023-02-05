@@ -104,9 +104,78 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         }
 
     }
+    async function merge(left1: number, right1: number, left2: number, right2: number){
 
-    async function mergeSort() {
+        currentBetween.value = [left1, right2]
+        
+        console.log("merging")
 
+
+        const tempArray: number[] = []
+
+        const arr1: number[] = []
+        const arr2: number[] = []
+
+        const dif1 = right1 - left1
+        const dif2 = right2 - left2
+
+        let ai = 0
+        let bi = 0
+
+        for(let i = 0; i <= dif1; i++) {
+            arr1.push(elements.value[left1 + i])             
+        }
+     
+        for(let i = 0; i <= dif2; i++) {
+            arr2.push(elements.value[left2 + i])             
+        }
+
+        console.log(arr1, arr2)
+
+        while(arr1.length && arr2.length) {
+            console.log("loopin")
+            if(arr1[0] < arr2[0]) {
+                tempArray.push(arr1[0])
+                arr1.shift()
+            }
+            else {
+                tempArray.push(arr2[0])
+                arr2.shift()
+            }
+        }
+        while(arr1.length) {
+            tempArray.push(arr1[0])
+            arr1.shift()
+        }
+        while(arr2.length) {
+            tempArray.push(arr2[0])
+            arr2.shift()
+        }
+
+        for(let i = 0; i < tempArray.length; i++) {
+            currentOne.value = left1 + i
+            await sleep(5)
+            elements.value[left1 + i] = tempArray[i]
+        }
+        console.log(tempArray)
+        // for(let el of tempArray) {
+        //     elements.value[left1 + i] = el
+        //     i++
+        // }
+        return
+    }
+
+    async function mergeSort(left: number, right: number): Promise<void> {
+        if(left >= right) return
+
+        const mid = Math.floor((right+left)/2) 
+
+
+        await mergeSort(left, mid)
+        await mergeSort(mid + 1, right) 
+
+
+        await merge(left, mid, mid + 1, right)
     }
 
 
