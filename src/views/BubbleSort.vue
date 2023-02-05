@@ -37,6 +37,9 @@
     }
 
     watch(currentAlgorithm, n => {
+
+        currentBetweenSuccess.value = [-1, -1]
+
         if(n == "bubbleSort") {
             size.value = 50
         }
@@ -66,6 +69,8 @@
 
     const visualizeAlgorithm = async(e: string) => {
 
+        currentBetweenSuccess.value = [-1, -1]
+
         if(rePopulateArrayBool.value) {
             populateArray(elements)
         } 
@@ -81,18 +86,21 @@
             await mergeSort(0, elements.value.length - 1)
         }
 
+        currentOne.value = -1
+        currentDouble.value = [-1, -1]
+        currentBetween.value = [-1, -1]
+
         for(let i in elements.value) {
             currentBetweenSuccess.value = [0, Number(i)]
             await sleep(15)
         }
+
         await sleep(1000)
-        currentBetweenSuccess.value = [-1, -1]
+
 
         rePopulateArrayBool.value = true
 
-        currentOne.value = -1
-        currentDouble.value = [-1, -1]
-        currentBetween.value = [-1, -1]
+      
     }
 
     onMounted(() => {
