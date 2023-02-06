@@ -110,6 +110,10 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         
         console.log("merging")
 
+        healSound.volume(volume.value * 10)
+        healSound.play()
+        healSound.rate(2)
+        healSound.fade(volume.value * 10, 0, 400)
 
         const tempArray: number[] = []
 
@@ -154,14 +158,13 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
 
         for(let i = 0; i < tempArray.length; i++) {
             currentOne.value = left1 + i
+            retroSearch.volume(volume.value/30)
+            retroSearch.play()
             await sleep(5)
             elements.value[left1 + i] = tempArray[i]
         }
-        console.log(tempArray)
-        // for(let el of tempArray) {
-        //     elements.value[left1 + i] = el
-        //     i++
-        // }
+       
+      
         return
     }
 

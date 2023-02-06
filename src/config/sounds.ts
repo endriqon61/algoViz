@@ -11,6 +11,10 @@ export function sounds(volume: Ref<number>) {
         rate: 0.5
     })
 
+    const ascend = new Howl({
+        src: 'ascend.wav'
+    })
+
     const retroSearch = new Howl({
         src: 'short_retro3.mp3',
         rate: 0.5
@@ -21,6 +25,6 @@ export function sounds(volume: Ref<number>) {
     })
 
 
-    return { healSound , retroJump, retroSearch, retroSwap }
+    return { ascend, healSound , retroJump, retroSearch, retroSwap }
 
 }

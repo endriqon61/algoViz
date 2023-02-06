@@ -11,7 +11,7 @@
 </template>
 <script setup lang="ts">
     import sortingAlgorithms from "@/algorithms/sortingAlgorithms";
-    import AlgorithmPickerMenu from "@/components/Navigation/AlgorithmPickerMenu.vue";
+    import AlgorithmPickerMenu from "@/components/Navigation/algorithmPickerMenu.vue";
     import { ref, watch, onMounted } from "vue"
     import { sounds } from "@/config/sounds"
     import type { Ref } from "vue"
@@ -90,10 +90,18 @@
         currentDouble.value = [-1, -1]
         currentBetween.value = [-1, -1]
 
+        await sleep(200)
+        sound.ascend.play()
+        sound.ascend.rate(0.4)
+        sound.ascend.fade(0, 1, 2000)
+        console.time('loop')
         for(let i in elements.value) {
             currentBetweenSuccess.value = [0, Number(i)]
-            await sleep(15)
+
+            const sleepTime = Math.floor(400/size.value) <= 1 ? 1 : Math.floor(400/size.value)*4.45
+            await sleep(sleepTime)
         }
+        console.timeEnd('loop')
 
         await sleep(1000)
 
