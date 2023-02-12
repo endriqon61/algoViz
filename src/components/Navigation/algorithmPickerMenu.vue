@@ -9,7 +9,7 @@
         </div>
         
         <div class="buttons">
-            <button class="disabled" v-if="type == 'sorting'" @click="clearGraph">
+            <button class="disabled" v-if="type == 'pathfinding'" @click="clearGraph">
                 Clear Walls And Weights
             </button>
             <button class="disabled" @click="visualize">
