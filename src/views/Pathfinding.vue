@@ -1,6 +1,6 @@
 <template lang="">
     <div class="main-container">
-        <AlgorithmPickerMenu class="menu" @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" menu-type="pathfinding" :options="options"/>
+        <AlgorithmPickerMenu :class="{'disable-pointers': !algorithmFinishedGlobal}" class="menu"  @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" menu-type="pathfinding" :options="options"/>
         <div class="grid-container">
                 <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
                 <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
@@ -12,14 +12,17 @@
     import Node from "../components/Graph/Node.vue"
     import bfs, {bfsSync} from "@/algorithms/search/breadthFirst"
     import dijkstras, {dijkstrasSync} from "@/algorithms/search/dijkstras"
-    import AlgorithmPickerMenu from "../components/Navigation/AlgorithmPickerMenu.vue"
+    import AlgorithmPickerMenu from "../components/Navigation/algorithmPickerMenu.vue"
     import aStar, { aStarSync } from "@/algorithms/search/aStar"
     import type { INode } from "../interfaces/Graph"
     import type { Ref } from "vue"
-    import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch } from "vue"
+    import { ref, onMounted, onUnmounted, getCurrentInstance, unref, nextTick} from "vue"
     import sleep from "@/utils/sleep"
     import { generateIndex } from "@/utils/graphUtils"
-    
+
+    import { useAlgoStore } from "@/store/algoStore"    
+
+
 
     const newStartNode: Ref<number[]> = ref([6,8])
     const wallMode = ref(false)
@@ -40,7 +43,10 @@
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
     const algorithmFinished: Ref<boolean> = ref(false)
-   
+    
+
+
+    let { algorithmFinishedGlobal } = useAlgoStore()
 
     function toggleWallNode(e: any) {
         if(e.key == "w") {
@@ -52,12 +58,12 @@
         }
     }
 
-    
   
     let nodesToChangeOld: any[] = []
 
     function dragEndHandler() {
 
+            console.log("drag end")
             if(nodeList.value[cols.value*(newStartNode.value[0] - 1) + newStartNode.value[1] - 1].isWallNode) {
                 newStartNode.value = oldStartNode.value
                 return
@@ -93,7 +99,7 @@
 
                         clearShadowGraph(false)
                         nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = false
-
+                        // nodeList.value[generateIndex(newStartNode.value, cols.value)].isStartNode = false
                         newStartNode.value = [parseInt(e.dataset.row), parseInt(e.dataset.col)]
                         nodeListTest[generateIndex(newStartNode.value, cols.value)].isStartNode = true
                         if(algorithmFinished.value) {
@@ -176,6 +182,7 @@
             currentDraggingNode.value = "start"
             oldStartNode.value = [parseInt(ds.row!), parseInt(ds.col!)]
 
+            nodeList.value[generateIndex(oldStartNode.value, cols.value)].isStartNode = true
         }
 
     }
@@ -260,6 +267,7 @@
     }
     async function visualizeAlgorithm(e: any) {
         algorithmFinished.value = false;
+        algorithmFinishedGlobal = false;
         for(let node of nodesToChangeOld!){
                     // nodeList.value[generateIndex(node, cols.value)].isVisited = true
                     let testNode = document.getElementById(node.join())
@@ -282,11 +290,18 @@
             await bfs(startNode, rows, cols, nodeList, endNode)
             currentAlgorithm.value = "bfs"
         }
-        algorithmFinished.value = true;
-
+        console.log("algorithm finisheeeeeeeed")
+        
+        algorithmFinishedGlobal = true
+        instance?.proxy?.$forceUpdate();
+        algorithmFinished.value = true
     }
+
     onMounted(() => {
+
         window.addEventListener('keypress', toggleWallNode)
+        console.log("algo finished", algorithmFinishedGlobal)
+
     }) 
 
     onUnmounted(() => {

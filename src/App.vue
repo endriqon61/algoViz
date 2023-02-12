@@ -9,7 +9,7 @@ import HelloWorld from './components/HelloWorld.vue'
 </div>
 </template>
 
-<style>
+<style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
   .router {
     width: 100vw;
@@ -27,5 +27,13 @@ import HelloWorld from './components/HelloWorld.vue'
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .disable-pointers{
+    pointer-events: none;
+
+    .disabled {
+      background-color: rgb(129, 28, 48);
+      color: rgb(0, 0, 58);
+    }
   }
 </style>

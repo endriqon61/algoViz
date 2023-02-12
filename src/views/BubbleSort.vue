@@ -1,6 +1,6 @@
 <template lang="">
     <div>
-        <AlgorithmPickerMenu @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
+        <AlgorithmPickerMenu :class="{'disable-pointers': !algorithmFinishedGlobal}" @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
         <div class="array-container">
             <div v-for="(el, index) in elements" class="element" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] && index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
@@ -12,12 +12,15 @@
 <script setup lang="ts">
     import sortingAlgorithms from "@/algorithms/sortingAlgorithms";
     import AlgorithmPickerMenu from "@/components/Navigation/algorithmPickerMenu.vue";
-    import { ref, watch, onMounted } from "vue"
+    import { getCurrentInstance, ref, watch, onMounted } from "vue"
     import { sounds } from "@/config/sounds"
     import type { Ref } from "vue"
     import sleep from "@/utils/sleep";
+    import { useAlgoStore } from "@/store/algoStore";
+    
 
     const elements: Ref<number[]> = ref([14, 13, 12, 15])
+    const instance = getCurrentInstance()
     const currentDouble = ref([-1, -1])
     const options = ref(["bubbleSort", "mergeSort", "selectionSort", "quickSort"])
     const currentOne = ref(-1)
@@ -28,7 +31,7 @@
     const currentAlgorithm: Ref<string> = ref("")
     const rePopulateArrayBool: Ref<boolean> = ref(false)
     const currentBetweenSuccess: Ref<number[]> = ref([-1, -1])
-
+    let { algorithmFinishedGlobal } = useAlgoStore()
     const { mergeSort, quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef)
 
 
@@ -69,6 +72,7 @@
 
     const visualizeAlgorithm = async(e: string) => {
 
+        algorithmFinishedGlobal = false
         currentBetweenSuccess.value = [-1, -1]
 
         if(rePopulateArrayBool.value) {
@@ -106,7 +110,9 @@
         await sleep(1000)
 
 
+        algorithmFinishedGlobal = true
         rePopulateArrayBool.value = true
+        instance?.proxy?.$forceUpdate()
 
       
     }

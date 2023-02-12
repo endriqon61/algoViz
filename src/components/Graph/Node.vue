@@ -1,5 +1,5 @@
 <template lang="">
-    <div @click="log()" :draggable="props.isStartNode || props.isEndNode" @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
+    <div @click="log()"  @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
         <span v-if="props.weight > 1" class="weight">{{props.weight}}</span>       
          <div :class="{'animation-visited': props.isVisited, road: props.isRoadNode } "></div> 
          <img v-if="props.isStartNode" src="/in-love.svg"/>
@@ -15,7 +15,6 @@ const newStartNode: any = ref()
 const nodeElementWithId: any = document.getElementById("nodeId")
 const props = defineProps<{
     heuristic: number,
-    toggleAnimation: boolean,
     distance: number,
     isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, weight: number, row: number, col: number
 }>()

@@ -1,7 +1,7 @@
 <template>
     <div class="menu-container">
         <div @click="() => { showDropDown = !showDropDown }" class="dropdown-btn">O
-            <div v-if="showDropDown" class="dropdown-menu">
+            <div v-if="showDropDown" class="disabled dropdown-menu">
                 <div v-for="option in options" @click="setSelectedAlgorithm(option)" class="options">
                     {{ option }}
                 </div>
@@ -9,10 +9,10 @@
         </div>
         
         <div class="buttons">
-            <button v-if="type == 'sorting'" @click="clearGraph">
+            <button class="disabled" v-if="type == 'sorting'" @click="clearGraph">
                 Clear Walls And Weights
             </button>
-            <button @click="visualize">
+            <button class="disabled" @click="visualize">
                 Visualize {{ selectedAlgorithm }}{{ selectedAlgorithm ? '!' : '' }}
             </button>
         </div>
