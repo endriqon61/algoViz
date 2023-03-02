@@ -14,11 +14,17 @@ const nodeElement: any = ref(null)
 const newStartNode: any = ref()
 const nodeElementWithId: any = document.getElementById("nodeId")
 const props = defineProps<{
+    speed: string | number,
     heuristic: number,
     distance: number,
     isEndNode: boolean, isWallNode: boolean; isStartNode: boolean, isVisited: boolean, isRoadNode: boolean, weight: number, row: number, col: number
 }>()
 
+onMounted(() => {
+    const node: HTMLElement|null = document.querySelector<HTMLElement>('.node')
+    node?.style.setProperty('--animation-duration', `${Number(props.speed) * 30}ms`)
+    console.log("speed", props.speed)
+})
 function log() {
     console.log("heurstic")
     console.log(props.heuristic)
@@ -92,7 +98,8 @@ img {
     height: 100%;
     background-color: pink;
     z-index: -99;
-    animation: visitedNode 600ms forwards ease-in;
+    animation: visitedNode forwards ease-in;
+    animation-duration: var(--animation-duration);
 }
 .visited {
 
@@ -113,7 +120,7 @@ img {
 
 .wall {
     background-color: rgb(35, 0, 52);
-    animation: wallAnimation 600ms ease-in;
+    animation: wallAnimation  600ms ease-in;
 
 }
 

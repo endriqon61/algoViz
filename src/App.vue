@@ -11,6 +11,9 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+:root{
+    --animation-duration: 600ms;
+}
   .router {
     width: 100vw;
     height: 100vh;

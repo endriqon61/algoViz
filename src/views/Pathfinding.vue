@@ -3,9 +3,11 @@
         <AlgorithmPickerMenu :class="{'disable-pointers': !algorithmFinishedGlobal}" class="menu"  @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" type="pathfinding" :options="options"/>
         <div class="grid-container">
                 <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
-                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
+                <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :speed="speed" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
                 </div>
         </div>
+
+        <input type="range" min="1" max="5" v-model="speed" @change="(e) => {e.value = speed}"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -16,7 +18,7 @@
     import aStar, { aStarSync } from "@/algorithms/search/aStar"
     import type { INode } from "../interfaces/Graph"
     import type { Ref } from "vue"
-    import { ref, onMounted, onUnmounted, getCurrentInstance, unref, nextTick} from "vue"
+    import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch } from "vue"
     import sleep from "@/utils/sleep"
     import { generateIndex } from "@/utils/graphUtils"
 
@@ -24,6 +26,7 @@
 
 
 
+    const speed = ref(5)    
     const newStartNode: Ref<number[]> = ref([6,8])
     const wallMode = ref(false)
     let nodeList: Ref<Array<INode>> = ref([]);
@@ -43,7 +46,7 @@
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
     const algorithmFinished: Ref<boolean> = ref(false)
-    
+    const rootElement = document.querySelector(":root") as HTMLElement
 
 
     let { algorithmFinishedGlobal } = useAlgoStore()
@@ -58,7 +61,11 @@
         }
     }
 
-  
+    watch(speed, (oldValue, newValue)=> {
+        rootElement.style.setProperty('--animation-duration', `${2500 - oldValue*400}ms`) 
+        console.log("root", rootElement.style.getPropertyValue('--animation-duration'))
+    })
+
     let nodesToChangeOld: any[] = []
 
     function dragEndHandler() {
@@ -287,7 +294,7 @@
             currentAlgorithm.value = "dijkstras"
         } else if(e == "Bfs") {
             currentAlgorithm.value = ""
-            await bfs(startNode, rows, cols, nodeList, endNode)
+            await bfs(startNode, rows, cols, nodeList, endNode, speed)
             currentAlgorithm.value = "bfs"
         }
         console.log("algorithm finisheeeeeeeed")

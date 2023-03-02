@@ -50,7 +50,7 @@ export function bfsSync(s: number[], rows: number, cols: number, nodeList: INode
 
 
 
-export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Ref<number>, nodeList: Ref<INode[]>, e: Ref<number[]>)
+export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Ref<number>, nodeList: Ref<INode[]>, e: Ref<number[]>, speed: Ref<number>)
 {
     let queue=[];
     
@@ -69,7 +69,7 @@ export default  async function bfs(s: Ref<number[]>, rows: Ref<number>, cols: Re
             await buildRoad(nodeList, cols.value, sleep, e.value, predecessorList, s.value)
             return
         }
-        await sleep(10)
+        await sleep(300 - (speed.value * 52))
         currentNode = queue[0];
         queue.shift();
         let adj: Array<number[]> = getAdjacentNodes(currentNode, rows.value, cols.value, nodeList.value)
