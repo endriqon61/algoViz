@@ -1,13 +1,20 @@
 <template lang="">
-    <div>
+    <div class="flex items-end justify-center h-full">
         <AlgorithmPickerMenu :class="{'disable-pointers': !algorithmFinishedGlobal}" @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
         <div class="array-container">
-            <div v-for="(el, index) in elements" class="element" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] && index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
+            <div v-for="(el, index) in elements" class="element" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] && index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 20) + 'px', width: String(800/size) + 'px'}"></div>
         </div>
-        <label for="volume-slider">Volume: </label>
-        <input type="range" min="0" max="10" v-model="volumeRef" @change="(e) => {e.value = volumeRef}"/>
-        <input style='{color: red}' type="range" min="1" max="5" v-model="speed" @change="(e) => {e.value = speed}"/>
+        <div class="fixed bottom-0 flex w-full flex items-center justify-start">
+            <div class="flex flex-col m-2 p-2 bg-purple-400 rounded shadow-md">
+                <label for="volume-slider">Volume: </label>
+                <input class="accent-gray-600" type="range" id="volume-slider" min="0" max="10" v-model="volumeRef" @change="(e) => {e.value = volumeRef}"/>
+            </div>
+            <div class="flex flex-col m-2 p-2 bg-purple-400 rounded shadow-md">
+                <label for="speed-slider">Speed: </label>
+                <input class="accent-gray-600" style='{color: red}' id="speed-slider" type="range" min="1" max="5" v-model="speed" @change="(e) => {e.value = speed}"/>
+            </div>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -66,7 +73,7 @@
 
         arr.value = []
         for(let i = 0; i < size.value; i++) {
-            arr.value.push(Math.floor(Math.random() * 50))
+            arr.value.push(Math.floor(Math.random() * 35))
         }
 
     }

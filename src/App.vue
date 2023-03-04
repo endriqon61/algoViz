@@ -4,21 +4,24 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-<div class="container">
-  <RouterView class="router"/>
+<div class="router-container">
+  <RouterView/>
 </div>
 </template>
 
 <style lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
-:root{
-    --animation-duration: 600ms;
-}
-  .router {
+  @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
+  :root{
+      --animation-duration: 600ms;
+  }
+  .router-container {
     width: 100vw;
     height: 100vh;
-    position: absolute;
+    position: fixed;
+    inset: 0;
   }
+  
   * {
     user-select: none;
   }

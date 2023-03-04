@@ -2,26 +2,29 @@
 </script>
 
 <template>
-  <main>
-  <h1>Hello</h1>
-  <div class="router-links">
-    <router-link to="/binarySearch">binarySearch</router-link>
-    <router-link to="/bubbleSort">bubbleSort</router-link>
-    <router-link to="/pathfinding">Pathfinding Algorithms</router-link>
+  <main class="bg-gray-300 h-full">
+  <div class="flex justify-around items-center h-full">
+    <router-link class="router-link" to="/bubbleSort">
+      <AlgorithmCard icon="sort" />
+    </router-link>
+    <router-link class="router-link" to="/pathfinding">
+      <AlgorithmCard icon="destination"/>
+    </router-link>
   </div>
   </main>
 
 
 </template>
 
+<script setup>
+import AlgorithmCard from '@/components/AlgorithmCard.vue'
+</script>
 <style scoped lang="scss">
 
-.router-links {
-    display: flex;
-
-    * {
-      margin: 15px;
-    }
+.router-link {
+  &:hover {
+    background-color: transparent;
+  }
 }
 
 </style>

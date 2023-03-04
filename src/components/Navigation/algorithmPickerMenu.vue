@@ -1,20 +1,40 @@
 <template>
     <div class="menu-container">
-        <div @click="() => { showDropDown = !showDropDown }" class="dropdown-btn">O
+        <div class="m-2 flex items-center shadow-lg bg-purple-500 rounded flex justify-between">
+
+
+        <div @click="() => { showDropDown = !showDropDown }" class="dropdown-btn">
+            
+            <div class="m-2 disabled shadow-md bg-purple-400 p-2 rounded">
+
+                <span>
+                    Choose Algoirthm
+                </span>
+                <span v-if="showDropDown">
+                &#9650 
+                </span>
+                <span v-else>
+                &#9660
+                </span>
+            </div>
+
             <div v-if="showDropDown" class="disabled dropdown-menu">
                 <div v-for="option in options" @click="setSelectedAlgorithm(option)" class="options">
                     {{ option }}
                 </div>
             </div>
+
         </div>
         
         <div class="buttons">
-            <button class="disabled" v-if="type == 'pathfinding'" @click="clearGraph">
+            <button class="disabled m-2 shadow-md bg-purple-400 p-2 rounded" v-if="type == 'pathfinding'" @click="clearGraph">
                 Clear Walls And Weights
             </button>
-            <button class="disabled" @click="visualize">
+            <button class="disabled m-2 shadow-md bg-purple-400 p-2 rounded" @click="visualize">
                 Visualize {{ selectedAlgorithm }}{{ selectedAlgorithm ? '!' : '' }}
             </button>
+        </div>
+
         </div>
     </div>
 </template>
@@ -72,9 +92,6 @@
     }
     .menu-container {
         width: 100vw;
-        padding: 15px;
-        display: flex;
-        justify-content: space-between;
         position: fixed;
         top: 0;
         z-index: 900000;
