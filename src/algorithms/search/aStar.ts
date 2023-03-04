@@ -100,7 +100,7 @@ export function aStarSync(s: number[], rows: number, cols: number, graph: INode[
     return nodesToAnimate
 }
 
-export default async function aStar(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) {
+export default async function aStar(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>, speed: Ref<number>) {
     setHeuristics(graph.value, e.value)
     const startNode = graph.value[generateIndex(s.value, cols)]
     const predecessorList: Array<{node: string, predecessor: string}> = []
@@ -117,7 +117,7 @@ export default async function aStar(s: Ref<number[]>, rows: number, cols: number
 
         const adjacentNodes: Array<number[]> = getAdjacentNodes([currentNode.row, currentNode.col], rows, cols, graph.value) 
 
-        await sleep(25)
+        await sleep(300 - (speed.value * 52))
         for(const adjNode in adjacentNodes) {
 
             const neighbor = graph.value[generateIndex(adjacentNodes[adjNode], cols)]

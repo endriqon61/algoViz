@@ -285,12 +285,12 @@
         // startNode.value = newStartNode.value
         if(e == "aStar") {
             currentAlgorithm.value = ""
-            await aStar(startNode, rows.value, cols.value, nodeList, endNode)
+            await aStar(startNode, rows.value, cols.value, nodeList, endNode, speed)
             currentAlgorithm.value = "aStar"
 
         } else if (e == "dijkstras") {
             currentAlgorithm.value = ""
-            await dijkstras(startNode, rows.value, cols.value, nodeList, endNode)
+            await dijkstras(startNode, rows.value, cols.value, nodeList, endNode, speed)
             currentAlgorithm.value = "dijkstras"
         } else if(e == "Bfs") {
             currentAlgorithm.value = ""

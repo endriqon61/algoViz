@@ -3,7 +3,7 @@ import type { INode } from '@/interfaces/Graph';
 import { getAdjacentNodes, buildRoad, generateIndex, buildRoadSync,findShortestDistanceNode } from '@/utils/graphUtils';
 import  sleep  from '@/utils/sleep'
 
-export const dijkstrasSync = (s: number[], rows: number, cols: number, graph: INode[], e: number[]): number[][] => {
+export const dijkstrasSync = (s: number[], rows: number, cols: number, graph: INode[], e: number[] ): number[][] => {
   graph[generateIndex(s, cols)].distance = 0
   const predecessorList: Array<{node: string, predecessor: string}> = []
   const nodesToChange = [];
@@ -42,7 +42,7 @@ export const dijkstrasSync = (s: number[], rows: number, cols: number, graph: IN
 };
 
 
-const dijkstras = async(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>) => {
+const dijkstras = async(s: Ref<number[]>, rows: number, cols: number, graph: Ref<INode[]>, e: Ref<number[]>, speed: Ref<number>) => {
   graph.value[generateIndex(s.value, cols)].distance = 0
   const predecessorList: Array<{node: string, predecessor: string}> = []
 
@@ -50,7 +50,7 @@ const dijkstras = async(s: Ref<number[]>, rows: number, cols: number, graph: Ref
 
     const shortestDistanceNode = graph.value[generateIndex(findShortestDistanceNode(graph.value, false), cols)]
     const adjacentNodes: Array<number[]> = getAdjacentNodes([shortestDistanceNode.row, shortestDistanceNode.col], rows, cols, graph.value) 
-    await sleep(1)
+    await sleep(300 - (speed.value * 52))
     shortestDistanceNode.isVisited = true 
     for(const adjNode in adjacentNodes) {
         predecessorList.push({node: [...adjacentNodes[adjNode]].join(), predecessor: [shortestDistanceNode.row, shortestDistanceNode.col].join()})

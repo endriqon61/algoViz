@@ -3,7 +3,7 @@ import sleep from '@/utils/sleep'
 import { swap } from '@/utils/sortingUtils';
 import { Howler, Howl } from 'howler'
 
-export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble: Ref<number[]>, currentOne: Ref<number>, currentBetween: Ref<number[]>,  {retroSearch, healSound, retroSwap, retroJump}: any, volume: Ref<number>) {
+export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble: Ref<number[]>, currentOne: Ref<number>, currentBetween: Ref<number[]>,  {retroSearch, healSound, retroSwap, retroJump}: any, volume: Ref<number>, speed: Ref<number>) {
 
       async function bubbleSort():  Promise<void> {
       
@@ -16,7 +16,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
             }
 
             for(let j = 0; j < elements.value.length - i - 1; j++) {
-                await sleep(5) 
+                await sleep(200 - (speed.value * 35)) 
                 currentDouble.value[0] = j
                 currentDouble.value[1] = j + 1
                 if(elements.value[j] > elements.value[j + 1]){
@@ -41,7 +41,8 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
 
             let currentMin = i;
             for(let j = i; j < elements.value.length; j++) {
-                await sleep(30)
+                await sleep(200 - (speed.value * 35)) 
+
                 retroSearch.volume(volume.value/50)
                 retroSearch.play()
 
@@ -52,7 +53,9 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
             }
             currentOne.value = -1
             currentDouble.value = [i, currentMin]
-            await sleep(50)
+
+            await sleep(300 - (speed.value * 45)) 
+
             retroSwap.volume(volume.value*10)
             retroSwap.play()
             swap(elements.value, i, currentMin)
@@ -67,7 +70,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         const pivot = elements.value[high]
         let i: number = low - 1
         for(let j = low; j < high; j++) {
-            await sleep(1)
+            await sleep(100 - (speed.value * 20)) 
             currentOne.value = j
             retroSearch.volume(volume.value/50)
             retroSearch.play()
@@ -160,7 +163,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
             currentOne.value = left1 + i
             retroSearch.volume(volume.value/30)
             retroSearch.play()
-            await sleep(5)
+            await sleep(100 - (speed.value * 20)) 
             elements.value[left1 + i] = tempArray[i]
         }
        

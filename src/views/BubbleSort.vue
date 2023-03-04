@@ -7,6 +7,7 @@
         </div>
         <label for="volume-slider">Volume: </label>
         <input type="range" min="0" max="10" v-model="volumeRef" @change="(e) => {e.value = volumeRef}"/>
+        <input style='{color: red}' type="range" min="1" max="5" v-model="speed" @change="(e) => {e.value = speed}"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -19,6 +20,7 @@
     import { useAlgoStore } from "@/store/algoStore";
     
 
+    const speed = ref(5)    
     const elements: Ref<number[]> = ref([14, 13, 12, 15])
     const instance = getCurrentInstance()
     const currentDouble = ref([-1, -1])
@@ -32,7 +34,7 @@
     const rePopulateArrayBool: Ref<boolean> = ref(false)
     const currentBetweenSuccess: Ref<number[]> = ref([-1, -1])
     let { algorithmFinishedGlobal } = useAlgoStore()
-    const { mergeSort, quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef)
+    const { mergeSort, quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef, speed)
 
 
     const setCurrentAlgorithm = (e: string) => {
