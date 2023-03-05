@@ -35,11 +35,11 @@ import HelloWorld from './components/HelloWorld.vue'
     align-items: center;
   }
   .disable-pointers{
-    pointer-events: none;
 
     .disabled {
       background-color: rgb(129, 28, 48);
       color: rgb(0, 0, 58);
+      pointer-events: none;
     }
   }
 </style>

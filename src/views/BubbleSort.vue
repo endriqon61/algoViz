@@ -1,19 +1,9 @@
 <template lang="">
-    <div class="flex items-end justify-center h-full">
-        <AlgorithmPickerMenu :class="{'disable-pointers': !algorithmFinishedGlobal}" @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
+    <div class="flex bg-purple-100 items-center justify-center h-full">
+        <AlgorithmPickerMenu @changeSpeed="(e) => {speed = e}" @changeVolume="(e) => {volume = e}" :class="{'disable-pointers': !algorithmFinishedGlobal}" @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
-        <div class="array-container">
-            <div v-for="(el, index) in elements" class="element" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] && index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 20) + 'px', width: String(800/size) + 'px'}"></div>
-        </div>
-        <div class="fixed bottom-0 flex w-full flex items-center justify-start">
-            <div class="flex flex-col m-2 p-2 bg-purple-400 rounded shadow-md">
-                <label for="volume-slider">Volume: </label>
-                <input class="accent-gray-600" type="range" id="volume-slider" min="0" max="10" v-model="volumeRef" @change="(e) => {e.value = volumeRef}"/>
-            </div>
-            <div class="flex flex-col m-2 p-2 bg-purple-400 rounded shadow-md">
-                <label for="speed-slider">Speed: </label>
-                <input class="accent-gray-600" style='{color: red}' id="speed-slider" type="range" min="1" max="5" v-model="speed" @change="(e) => {e.value = speed}"/>
-            </div>
+        <div class="array-container shadow-lg rounded bg-purple-50 p-4">
+            <div v-for="(el, index) in elements" class="element" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] && index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
         </div>
     </div>
 </template>
@@ -35,13 +25,13 @@
     const currentOne = ref(-1)
     const currentBetween: Ref<number[]> = ref([-1, -1])
     const size = ref(100)
-    const volumeRef: Ref<number>= ref(7)
-    const sound = sounds(volumeRef)
+    const volume: Ref<number>= ref(7)
+    const sound = sounds(volume)
     const currentAlgorithm: Ref<string> = ref("")
     const rePopulateArrayBool: Ref<boolean> = ref(false)
     const currentBetweenSuccess: Ref<number[]> = ref([-1, -1])
     let { algorithmFinishedGlobal } = useAlgoStore()
-    const { mergeSort, quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volumeRef, speed)
+    const { mergeSort, quickSort , bubbleSort, selectionSort } = sortingAlgorithms(elements, currentDouble, currentOne, currentBetween, sound, volume, speed)
 
 
     const setCurrentAlgorithm = (e: string) => {

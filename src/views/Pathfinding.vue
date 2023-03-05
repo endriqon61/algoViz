@@ -1,13 +1,12 @@
 <template lang="">
-    <div class="main-container">
-        <AlgorithmPickerMenu :class="{'disable-pointers': !algorithmFinishedGlobal}" class="menu"  @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" type="pathfinding" :options="options"/>
+    <div class="main-container bg-purple-100">
+        <AlgorithmPickerMenu @changeSpeed="(e)=> {speed = e}" :class="{'disable-pointers': !algorithmFinishedGlobal}" class="menu"  @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" type="pathfinding" :options="options"/>
         <div class="grid-container">
                 <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
                 <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :speed="speed" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
                 </div>
         </div>
 
-        <input type="range" min="1" max="5" v-model="speed" @change="(e) => {e.value = speed}"/>
     </div>
 </template>
 <script setup lang="ts">
