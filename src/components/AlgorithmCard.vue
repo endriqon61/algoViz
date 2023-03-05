@@ -1,6 +1,6 @@
 <template>
 <a
-  class="relative flex bg-gray-200 items-start justify-between rounded-xl border border-gray-100 p-4 shadow-xl sm:p-6 lg:p-8"
+  class="relative hover:bg-indigo-200 flex bg-indigo-100 items-start justify-between rounded-xl border border-indigo-900 p-4 shadow-lg sm:p-6 lg:p-8"
   href="#"
 >
   <div class="pt-4 text-gray-500">
@@ -10,7 +10,7 @@
     <img :src="`${icon}.png`"/>
     </div>
 
-    <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">
+    <h3 class="mt-4 text-lg font-bold text-indigo-900 sm:text-xl">
      {{ icon == 'sort' ? "Sorting Algorithms" : icon == 'destination' ? "Pathfinding Algorithms": "" }}
     </h3>
 

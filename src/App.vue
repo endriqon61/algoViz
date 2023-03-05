@@ -10,6 +10,7 @@ import HelloWorld from './components/HelloWorld.vue'
 </template>
 
 <style lang="scss">
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand&family=Varela+Round&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
 
   :root{
@@ -37,8 +38,7 @@ import HelloWorld from './components/HelloWorld.vue'
   .disable-pointers{
 
     .disabled {
-      background-color: rgb(129, 28, 48);
-      color: rgb(0, 0, 58);
+      opacity: 0.5;
       pointer-events: none;
     }
   }

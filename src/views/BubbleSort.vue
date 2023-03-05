@@ -1,9 +1,9 @@
 <template lang="">
-    <div class="flex bg-purple-100 items-center justify-center h-full">
+    <div class="flex bg-indigo-100 items-center justify-center h-full">
         <AlgorithmPickerMenu @changeSpeed="(e) => {speed = e}" @changeVolume="(e) => {volume = e}" :class="{'disable-pointers': !algorithmFinishedGlobal}" @pickAlgorithm="(e) => {setCurrentAlgorithm(e)}" @visualize="(e) => { visualizeAlgorithm(e) }" :options="options" menu-type="sorting"/>
 
-        <div class="array-container shadow-lg rounded bg-purple-50 p-4">
-            <div v-for="(el, index) in elements" class="element" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] && index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
+        <div class="array-container shadow-lg rounded bg-indigo-50 p-4">
+            <div v-for="(el, index) in elements" class="element bg-indigo-500 rounded-t" :class="{currentBetweenSuccess: index >= currentBetweenSuccess[0] && index <= currentBetweenSuccess[1],currentBetween: index >= currentBetween[0] && index <= currentBetween[1], currentDouble: index == currentDouble[0] || index == currentDouble[1], currentOne: index == currentOne}" :style="{height: String(el * 15) + 'px', width: String(800/size) + 'px'}"></div>
         </div>
     </div>
 </template>
@@ -129,8 +129,7 @@
     }
 
     .element {
-        background-color: rgb(200, 0, 255);
-        box-shadow: 0 0 5px -1px black;
+        box-shadow: 0 0 4px -1px black;
     }
 
 
@@ -144,6 +143,6 @@
         background-color: rgb(242, 83, 78);
     }
     .currentBetweenSuccess {
-        background-color: rgb(36, 237, 83);
+        background-color: #86efac;
     }
 </style>

@@ -59,9 +59,9 @@ onMounted(() => {
 }
 
 .node {
-    box-shadow: 0px 0px 1px 0px rgb(123, 123, 123);
-    box-shadow: 0px 0px 1px 0px rgb(123, 123, 123);
-    box-shadow: 0px 0px 1px 0px rgb(123, 123, 123);
+    box-shadow: 0px 0px 1px 0px #60a5fa;
+    webkit-box-shadow: 0px 0px 1px 0px #60a5fa;
+    moz-box-shadow: 0px 0px 1px 0px #60a5fa;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -139,22 +139,22 @@ img {
 @keyframes visitedNode {
     0% {
         transform: scale(0.2);
-        background-color: rgb(73, 0, 1);
+        background-color: #d9f99d;
         border-radius: 100%;
     }
 
     50% {
         border-radius: 50%;
-        background-color: rgb(171, 22, 47);
+        background-color: #38bdf8;
     }
 
     80% {
-        background-color: rgb(253, 180, 194);
+        background-color: #22d3ee;
         transform: scale(1.2);
     }
 
     100% {
-        background-color: rgb(209, 25, 255);
+        background-color: #6366f1;
         border-radius: 0;
         transform: scale(1);
     }

@@ -1,8 +1,8 @@
 <template lang="">
-    <div class="main-container flex items-center bg-purple-100">
+    <div class="main-container flex items-center bg-indigo-100">
         <AlgorithmPickerMenu @changeSpeed="(e)=> {speed = e}" :class="{'disable-pointers': !algorithmFinishedGlobal}" class="menu"  @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" type="pathfinding" :options="options"/>
         <div class="grid-container">
-                <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid bg-purple-50 shadow-lg rounded overflow-hidden">
+                <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid bg-indigo-50 shadow-lg rounded overflow-hidden">
                 <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :speed="speed" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
                 </div>
         </div>
@@ -337,7 +337,7 @@
         align-items: center;
     }
     .vis {
-        background-color: rgb(209, 25, 255);
+        background-color: #6366f1;
     }
     .road-no-animation {
         background-color: rgb(207, 207, 207);
