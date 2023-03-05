@@ -97,7 +97,6 @@ img {
     width: 100%;
     height: 100%;
     background-color: pink;
-    z-index: -99;
     animation: visitedNode forwards ease-in;
     animation-duration: var(--animation-duration);
 }
@@ -106,7 +105,6 @@ img {
     width: 100%;
     height: 100%;
     background-color: pink;
-    z-index: -99;
 }
 
 .road {

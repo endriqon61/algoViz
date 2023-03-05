@@ -1,8 +1,8 @@
 <template lang="">
-    <div class="main-container bg-purple-100">
+    <div class="main-container flex items-center bg-purple-100">
         <AlgorithmPickerMenu @changeSpeed="(e)=> {speed = e}" :class="{'disable-pointers': !algorithmFinishedGlobal}" class="menu"  @clearGraph="() => {clearGraphs(true)}" @visualize="(e) => visualizeAlgorithm(e)" type="pathfinding" :options="options"/>
         <div class="grid-container">
-                <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid">
+                <div @keyup="(e) => { toggleWallNode(e) }" ref="grid" class="grid bg-purple-50 shadow-lg rounded overflow-hidden">
                 <Node @dragStartCustom="(ds) => {dragStart(ds)}" @dragCustom="(n, f) => { dragHandler(n, f)}" :id="[node.row, node.col].join()" v-for="node in nodeList" :key="[node.row, node.col].join()" @dragendCustom="() => {dragEndHandler()}" @wall="(r, c) => { makeWallNode(r, c) }" :speed="speed" :distance="node.distance" :weight="node.weight" :heuristic="node.heuristic" :isWallNode="node.isWallNode" :isStartNode="node.isStartNode" :isEndNode="node.isEndNode" :row="node.row" :col="node.col" :isRoadNode="node.isRoadNode" :isVisited="node.isVisited"/>
                 </div>
         </div>
@@ -41,7 +41,7 @@
     const options =  ["Bfs", "dijkstras", "aStar"]
     const currentAlgorithm: Ref<string> = ref("");
     const newEndNode = ref([10, 16])
-    const rows = ref(20);
+    const rows = ref(23);
     const cols = ref(50);
     const currentDraggingNode: Ref<string> = ref("")
     const algorithmFinished: Ref<boolean> = ref(false)
@@ -327,7 +327,7 @@
     .grid {
         display: grid;
         grid-template-columns: repeat(50, auto);
-        grid-template-rows: repeat(20, auto);
+        grid-template-rows: repeat(23, auto);
     } 
     .main-container {
         width: 100vw;
