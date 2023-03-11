@@ -1,15 +1,15 @@
 <template lang="">
-    <div @click="log()"  @dragstart="(e) => {dragStart(e)}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
+    <div @click="log()"  @dragstart="(e) => {dragStart(e)}" :ondragover="(e) => {e.preventDefault()}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
         <span v-if="props.weight > 1" class="weight">{{props.weight}}</span>       
          <div :class="{'animation-visited': props.isVisited, road: props.isRoadNode } "></div> 
-         <img v-if="props.isStartNode" src="/in-love.svg"/>
-         <img v-if="props.isEndNode" src="/cool.svg"/>
+         <img v-if="props.isStartNode" :class="{'dragging-node': dragging}" src="/in-love.svg"/>
+         <img v-if="props.isEndNode" :class="{'dragging-node': dragging}" src="/cool.svg"/>
     </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 const emit = defineEmits(['dragStartCustom', 'dragCustom', 'wall', 'dragendCustom'])
-const dragging = ref(true)
+const dragging = ref(false)
 const nodeElement: any = ref(null)
 const newStartNode: any = ref()
 const nodeElementWithId: any = document.getElementById("nodeId")
@@ -40,6 +40,7 @@ function dragHandler(e: Event) {
 }
 
 function dragStart(e: any) {
+    dragging.value = true
     emit("dragStartCustom", e.currentTarget.dataset)
 }
 function makeWallNode() {
@@ -58,6 +59,9 @@ onMounted(() => {
     user-select: none;
 }
 
+.dragging-node {
+    opacity: 0;
+}
 .node {
     box-shadow: 0px 0px 1px 0px #60a5fa;
     webkit-box-shadow: 0px 0px 1px 0px #60a5fa;
@@ -68,6 +72,14 @@ onMounted(() => {
     width: 25px;
     height: 25px;
 }
+.start, .end {
+    cursor: grab;
+}
+
+.start:active, .end:active{
+    cursor: grabbing !important;
+}
+
 
 .weight {
     position: absolute;

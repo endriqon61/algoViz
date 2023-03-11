@@ -17,7 +17,7 @@
     import aStar, { aStarSync } from "@/algorithms/search/aStar"
     import type { INode } from "../interfaces/Graph"
     import type { Ref } from "vue"
-    import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch } from "vue"
+    import { ref, onMounted, onUnmounted, getCurrentInstance, unref, watch, nextTick } from "vue"
     import sleep from "@/utils/sleep"
     import { generateIndex } from "@/utils/graphUtils"
 
@@ -69,6 +69,7 @@
 
     function dragEndHandler() {
 
+
             console.log("drag end")
             if(nodeList.value[cols.value*(newStartNode.value[0] - 1) + newStartNode.value[1] - 1].isWallNode) {
                 newStartNode.value = oldStartNode.value
@@ -83,6 +84,7 @@
             if(currentDraggingNode.value == "end") {
                 nodeList.value[cols.value*(oldEndNode.value[0] - 1) + oldEndNode.value[1] - 1].isEndNode = false
                 nodeList.value[cols.value*(newEndNode.value[0] - 1) + newEndNode.value[1] - 1].isEndNode = true
+    
 
             }else if(currentDraggingNode.value == "start") {
                 nodeList.value[cols.value*(oldStartNode.value[0] - 1) + oldStartNode.value[1] - 1].isStartNode = false
@@ -91,9 +93,20 @@
             }
 
             currentDraggingNode.value = ""
+           
+            nextTick(() => {
 
-            oldEndNode.value = endNode.value
-            oldStartNode.value = startNode.value
+            for(let node of nodesToChangeOld!){
+                let testNode = document.getElementById(node.join())
+                testNode?.classList.add('vis') 
+                if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
+            }      
+
+            })
+            
+            // oldEndNode.value = endNode.value
+            // oldStartNode.value = startNode.value
+            
 
     }
 
