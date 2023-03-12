@@ -9,7 +9,7 @@
     <span class="m-2">dsafsdfasdf</span>
   </div>
   <header class="flex justify-start items-center">
-    <img src="background.jpg" class="absolute h-full w-full object-cover object-center"/>
+    <img src="/background.jpg" class="absolute h-full w-full object-cover object-center"/>
     <div class="p-4 m-8">
       <h1 class="text-8xl text-blue-100 mb-8">Algo Viz</h1>
       <p class="text-xl mb-12 text-blue-300">Algorithm learning tool</p>

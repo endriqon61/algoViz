@@ -159,7 +159,6 @@
                     nodeListTest[generateIndex(newEndNode.value, cols.value)].isEndNode = true
 
 
-                    if(algorithmFinished.value) {
                         let nodesToChange: number[][]  = [] 
 
                         if(currentAlgorithm.value  == "aStar") {
@@ -183,7 +182,6 @@
                             if(nodeListTest[generateIndex(node, cols.value)].isRoadNode) testNode?.classList.add('road-no-animation')
                         }            
                         nodesToChangeOld = nodesToChange!.slice()
-                    }
                                
                 }
             }
@@ -287,6 +285,9 @@
     async function visualizeAlgorithm(e: any) {
         algorithmFinished.value = false;
         algorithmFinishedGlobal = false;
+        const start = document.getElementById(startNode.value.join(',')) as HTMLElement
+        console.log('element', start)
+        start.style.pointerEvents = "none";
         for(let node of nodesToChangeOld!){
                     // nodeList.value[generateIndex(node, cols.value)].isVisited = true
                     let testNode = document.getElementById(node.join())
@@ -309,7 +310,7 @@
             await bfs(startNode, rows, cols, nodeList, endNode, speed)
             currentAlgorithm.value = "bfs"
         }
-        console.log("algorithm finisheeeeeeeed")
+        start.style.pointerEvents = "initial"
         
         algorithmFinishedGlobal = true
         instance?.proxy?.$forceUpdate();
