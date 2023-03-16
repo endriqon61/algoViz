@@ -1,6 +1,6 @@
 <template>
 <a
-  class="relative hover:bg-indigo-200 flex bg-indigo-100 items-start justify-between rounded-xl border border-indigo-900 p-4 shadow-lg sm:p-6 lg:p-8"
+  class="relative m-2 hover:bg-indigo-200 flex bg-indigo-100 items-start justify-between rounded-xl border border-indigo-900 p-4 shadow-lg sm:p-6 lg:p-8"
   href="#"
 >
   <div class="pt-4 text-gray-500">

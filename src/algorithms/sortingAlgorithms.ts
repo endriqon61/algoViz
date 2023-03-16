@@ -21,13 +21,14 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
                 currentDouble.value[1] = j + 1
                 if(elements.value[j] > elements.value[j + 1]){
                     swap(elements.value, j+1, j)
-                    retroSearch.volume(volume.value/50)                    
+                    retroSearch.volume(volume.value/20)
+                    retroSearch.fade(volume.value/20, 0, 300)
                     retroSearch.play()
                 }
             }
             healSound.volume(volume.value/10)                    
             healSound.fade(volume.value/10, 0, 500)
-            healSound.rate(2)
+            healSound.rate(3)
             healSound.play()
         }
         currentDouble.value = [-1, -1]
@@ -43,7 +44,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
             for(let j = i; j < elements.value.length; j++) {
                 await sleep(200 - (speed.value * 35)) 
 
-                retroSearch.volume(volume.value/50)
+                retroSearch.volume(volume.value/20)
                 retroSearch.play()
 
                 currentOne.value = j
@@ -56,7 +57,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
 
             await sleep(300 - (speed.value * 45)) 
 
-            retroSwap.volume(volume.value*10)
+            retroSwap.volume(volume.value/10)
             retroSwap.play()
             swap(elements.value, i, currentMin)
             currentDouble.value = []
@@ -72,7 +73,8 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         for(let j = low; j < high; j++) {
             await sleep(100 - (speed.value * 20)) 
             currentOne.value = j
-            retroSearch.volume(volume.value/50)
+            retroSearch.volume(volume.value/20)
+            retroSearch.rate(volume.value/30, 0, 100)
             retroSearch.play()
             if(elements.value[j] < pivot) {
                 i++
@@ -96,7 +98,7 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         if(low < high) {
             await sleep(50)
             const pi = await partition(low , high)
-            healSound.volume(volume.value/50)
+            healSound.volume(volume.value/10)
             
             healSound.fade(volume.value/10, 0, 400, )
             healSound.rate(3)
@@ -113,10 +115,10 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         
         console.log("merging")
 
-        healSound.volume(volume.value * 10)
+        healSound.volume(volume.value/20)
         healSound.play()
-        healSound.rate(2)
-        healSound.fade(volume.value * 10, 0, 400)
+        healSound.rate(3)
+        healSound.fade(volume.value/20, 0, 400)
 
         const tempArray: number[] = []
 
@@ -160,8 +162,9 @@ export default function sortingAlgorithms(elements: Ref<number[]>, currentDouble
         }
 
         for(let i = 0; i < tempArray.length; i++) {
-            currentOne.value = left1 + i
-            retroSearch.volume(volume.value/30)
+            currentDouble.value = [left1 + i, (i > dif2 ? -1 : left2 + i)]
+            retroSearch.volume(volume.value/20)
+            retroSearch.fade(volume.value/20, 0, 100)
             retroSearch.play()
             await sleep(100 - (speed.value * 20)) 
             elements.value[left1 + i] = tempArray[i]

@@ -1,6 +1,6 @@
 <template lang="">
     <div @click="log()"  @dragstart="(e) => {dragStart(e)}" :ondragover="(e) => {e.preventDefault()}" :data-isEndNode="props.isEndNode" :data-row="props.row" :data-isStartNode="props.isStartNode" :data-col="props.col" draggable="false" @dragend="(e) => { dragEndHandler(e) }" @dragover="(e) => { dragHandler(e) }" @mouseover="makeWallNode()" id="nodeId" ref="nodeElement" class="node" :class="{wall: props.isWallNode ,start: props.isStartNode, end: props.isEndNode}">
-        <span v-if="props.weight > 1" class="weight">{{props.weight}}</span>       
+        <span v-if="props.weight > 1" class="weight bg-sky-50 border-2 border-indigo-500 border-solid text-indigo-500">{{props.weight}}</span>       
          <div :class="{'animation-visited': props.isVisited, road: props.isRoadNode } "></div> 
          <img v-if="props.isStartNode" :class="{'dragging-node': dragging}" src="/in-love.svg"/>
          <img v-if="props.isEndNode" :class="{'dragging-node': dragging}" src="/cool.svg"/>
@@ -88,11 +88,11 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     border-radius: 100%;
-    background-color: rgb(154, 225, 255);
-    color: black;
+    // background-color: rgb(154, 225, 255);
+    // color: black;
     text-align: center;
     animation: wallAnimation 600ms ease-in;
-    border: 1px solid black;
+    // border: 1px solid black;
 }
 
 img {
@@ -129,7 +129,7 @@ img {
 }
 
 .wall {
-    background-color: rgb(35, 0, 52);
+    background-color: #312e81;
     animation: wallAnimation  600ms ease-in;
 
 }

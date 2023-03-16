@@ -3,20 +3,17 @@
 
 <template>
   <main class="bg-indigo-50 h-full overflow-x-hidden overflow-y-scroll">
-  <div class="fixed text-indigo-50  z-50 top-0 w-full flex justify-end pr-8">
-    <span class="m-2">afewafew</span>
-    <span class="m-2">dsafds</span>
-    <span class="m-2">dsafsdfasdf</span>
-  </div>
-  <header class="flex justify-start items-center">
+
+  <header class="flex justify-start items-end">
+    <div class="absolute inset-0 bg-blue-900 z-10 mix-blend-multiply"></div>
     <img src="/background.jpg" class="absolute h-full w-full object-cover object-center"/>
-    <div class="p-4 m-8">
-      <h1 class="text-8xl text-blue-100 mb-8">Algo Viz</h1>
-      <p class="text-xl mb-12 text-blue-300">Algorithm learning tool</p>
-      <p class="text-base text-blue-400">Learn how algorithms work in an immersive and interactive feel</p>
+    <div class="p-4 m-8 z-30">
+      <h1 class="text-8xl text-blue-50 mb-8">VisuAL</h1>
+      <p class="text-3xl mb-12 text-blue-50">The best algorithm visualizing tool on the web</p>
+      <p class="text-md text-blue-100 max-w-3xl">Experience the power of algorithms like never before with our interactive visualization website. Discover complex concepts in a user-friendly and engaging way. Try it now and take your coding skills to the next level!</p>
     </div>
   </header>
-  <div class="flex justify-around items-center h-full">
+  <div class="flex justify-center items-center h-full">
     <router-link class="router-link" to="/bubbleSort">
       <AlgorithmCard icon="sort" />
     </router-link>
@@ -35,7 +32,7 @@ import AlgorithmCard from '@/components/AlgorithmCard.vue'
 <style scoped lang="scss">
 
 header {
-  background-color: purple;
+  background-color: rgb(28, 28, 137);
   height: 100%;
   min-height: 100dvh;
   width: 100vw;

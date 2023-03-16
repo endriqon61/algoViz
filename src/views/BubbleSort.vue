@@ -94,9 +94,10 @@
         currentBetween.value = [-1, -1]
 
         await sleep(200)
+        sound.ascend.volume(volume.value * 10)
         sound.ascend.play()
         sound.ascend.rate(0.4)
-        sound.ascend.fade(0, 1, 2000)
+        sound.ascend.fade(0, volume.value * 10, 2000)
         console.time('loop')
         for(let i in elements.value) {
             currentBetweenSuccess.value = [0, Number(i)]
